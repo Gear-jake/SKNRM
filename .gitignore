@@ -1,0 +1,10 @@
+﻿# 编译产物
+out/
+*.dll
+*.pdb
+errors.txt
+build_diag.txt
+*.zip
+
+# 本地测试残留
+TEST-REPORT.md
