@@ -91,20 +91,16 @@ namespace SKNRM
                 nameof(QuantumSpritePrefix), null, "图标/粒子跳帧");
             ok += Guards.Patch(harmony, typeof(PerfBoost), typeof(MapLayer), "draw", new[] { typeof(float) }, nameof(LayerDrawPrefix), nameof(LayerDrawPostfix), "地图层绘制节流");
 
-            ok += Guards.Patch(harmony, typeof(PerfBoost), typeof(PowersTab), "update", Type.EmptyTypes,
-                nameof(PowersTabPrefix), null, "权能标签节流");
             ok += Guards.Patch(harmony, typeof(PerfBoost), typeof(ProjectileManager), "update", new[] { typeof(float) },
                 nameof(ProjectilePausePrefix), null, "暂停冻结投射物");
             ok += Guards.Patch(harmony, typeof(PerfBoost), typeof(PlayerControl), "isPointerOverUIButton", Type.EmptyTypes,
                 nameof(PointerPrefix), nameof(PointerPostfix), "鼠标命中缓存");
-            ok += Guards.Patch(harmony, typeof(PerfBoost), typeof(PowerButtonSelector), "updateTopButtons", Type.EmptyTypes,
-                nameof(PowerButtonsPrefix), null, "权能按钮栏节流");
             ok += Guards.Patch(harmony, typeof(PerfBoost), typeof(UiWorldAgeInfo), "Update", Type.EmptyTypes,
                 nameof(WorldAgeUiPrefix), null, "纪元卡片节流");
             ok += Guards.Patch(harmony, typeof(PerfBoost), typeof(Actor), "addStatusEffect",
                 new[] { typeof(StatusAsset), typeof(float), typeof(bool) },
                 nameof(AddStatusPrefix), null, "重复状态跳过");
-            Log.Info("性能增强补丁安装 " + ok + "/10（帧率/可见对象/图标跳帧/地图层/标签/投射物/鼠标/按钮栏/纪元卡/重复状态）");
+            Log.Info("性能增强补丁安装 " + ok + "/8（帧率/可见对象/图标跳帧/地图层/投射物/鼠标/纪元卡/重复状态）");
         }
 
         // ── ① 高帧率不影响游戏速度 ──
@@ -224,28 +220,6 @@ namespace SKNRM
         }
 
 
-        // ── ④ 权能标签节流 ──
-        private static int _lastTabFrame = -1;
-
-        private static bool PowersTabPrefix(PowersTab __instance)
-        {
-            if (!PerfConfig.I.PowersTabThrottle) return true;
-            try
-            {
-                int frame = Time.frameCount;
-                if (frame - _lastTabFrame < 15)
-                {
-                    PerfStats.Skip(ref PerfStats.PowersTabSkipped);
-                    return false;
-                }
-                _lastTabFrame = frame;
-                try { __instance.sortButtons(); } catch { }
-                try { __instance.setNewWidth(); } catch { }
-                return false;
-            }
-            catch (Exception e) { PerfStats.OnException(e); return true; }
-        }
-
         // ── ⑤ 暂停时冻结投射物 ──
         private static bool ProjectilePausePrefix()
         {
@@ -297,26 +271,6 @@ namespace SKNRM
                 _hasCachedPointer = true;
             }
             catch { }
-        }
-
-        // ── ⑦ 权能按钮栏节流 ──
-        private static int _lastButtonFrame = -1;
-
-        private static bool PowerButtonsPrefix()
-        {
-            if (!PerfConfig.I.PowerButtonsThrottle) return true;
-            try
-            {
-                int frame = Time.frameCount;
-                if (frame - _lastButtonFrame < 10)
-                {
-                    PerfStats.Skip(ref PerfStats.PowerButtonsSkipped);
-                    return false;
-                }
-                _lastButtonFrame = frame;
-            }
-            catch (Exception e) { PerfStats.OnException(e); return true; }
-            return true;
         }
 
         // ── ⑧ 纪元卡片节流 ──

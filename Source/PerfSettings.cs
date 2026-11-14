@@ -15,8 +15,7 @@ namespace SKNRM
         private static ModConfigItem _skipPathStart, _skipDecision, _unfair, _antiDrop, _verbose;
         private static ModConfigItem _unlockFrameRate, _displayFps, _fpsIndependentSpeed;
         private static ModConfigItem _quantumThrottle, _mapLayerThrottle;
-        private static ModConfigItem _powersTabThrottle, _pauseProjectiles;
-        private static ModConfigItem _cachePointerOverUi, _powerButtonsThrottle, _worldAgeUiThrottle, _skipDuplicateStatus;
+        private static ModConfigItem _pauseProjectiles, _cachePointerOverUi, _worldAgeUiThrottle, _skipDuplicateStatus, _visibleActorsThrottle;
         internal static bool Ready { get; private set; }
 
         internal static void Init(ModConfig config)
@@ -46,10 +45,8 @@ namespace SKNRM
                 _fpsIndependentSpeed = config.AddConfigItem(Group, "fps_independent_speed", ConfigItemType.SWITCH, c.FpsIndependentSpeed);
                 _quantumThrottle = config.AddConfigItem(Group, "quantum_sprite_throttle", ConfigItemType.SWITCH, c.QuantumSpriteThrottle);
                 _mapLayerThrottle = config.AddConfigItem(Group, "map_layer_throttle", ConfigItemType.SWITCH, c.MapLayerThrottle);
-                _powersTabThrottle = config.AddConfigItem(Group, "powers_tab_throttle", ConfigItemType.SWITCH, c.PowersTabThrottle);
                 _pauseProjectiles = config.AddConfigItem(Group, "pause_projectiles", ConfigItemType.SWITCH, c.PauseProjectiles);
                 _cachePointerOverUi = config.AddConfigItem(Group, "cache_pointer_ui", ConfigItemType.SWITCH, c.CachePointerOverUi);
-                _powerButtonsThrottle = config.AddConfigItem(Group, "power_buttons_throttle", ConfigItemType.SWITCH, c.PowerButtonsThrottle);
                 _worldAgeUiThrottle = config.AddConfigItem(Group, "world_age_ui_throttle", ConfigItemType.SWITCH, c.WorldAgeUiThrottle);
                 _skipDuplicateStatus = config.AddConfigItem(Group, "skip_duplicate_status", ConfigItemType.SWITCH, c.SkipDuplicateStatus);
 
@@ -83,14 +80,10 @@ namespace SKNRM
                 LM.AddToCurrentLocale("quantum_sprite_throttle Description", "库存堆、家族图标、幸福/任务/社交图标、军队与箭头按 2–6 帧分级刷新。");
                 LM.AddToCurrentLocale("map_layer_throttle", "地图层绘制节流");
                 LM.AddToCurrentLocale("map_layer_throttle Description", "区域层每 2 帧、单位层每 4 帧绘制一次（步长可在配置文件里改）。");
-                LM.AddToCurrentLocale("powers_tab_throttle", "权能标签节流");
-                LM.AddToCurrentLocale("powers_tab_throttle Description", "权能按钮每 15 帧才重排一次。");
                 LM.AddToCurrentLocale("pause_projectiles", "暂停时冻结投射物");
                 LM.AddToCurrentLocale("pause_projectiles Description", "游戏暂停时不再更新投射物（真正的暂停）。");
                 LM.AddToCurrentLocale("cache_pointer_ui", "鼠标 UI 命中缓存");
                 LM.AddToCurrentLocale("cache_pointer_ui Description", "鼠标不动时复用上一帧的 UI 命中结果，省掉每帧的 UI 射线检测。");
-                LM.AddToCurrentLocale("power_buttons_throttle", "权能按钮栏节流");
-                LM.AddToCurrentLocale("power_buttons_throttle Description", "权能按钮栏每 10 帧更新一次。");
                 LM.AddToCurrentLocale("world_age_ui_throttle", "纪元卡片节流");
                 LM.AddToCurrentLocale("world_age_ui_throttle Description", "纪元/年份卡片每 5 帧刷新一次。");
                 LM.AddToCurrentLocale("skip_duplicate_status", "重复状态跳过");
@@ -128,10 +121,8 @@ namespace SKNRM
                 c.FpsIndependentSpeed = _fpsIndependentSpeed.BoolVal;
                 c.QuantumSpriteThrottle = _quantumThrottle.BoolVal;
                 c.MapLayerThrottle = _mapLayerThrottle.BoolVal;
-                c.PowersTabThrottle = _powersTabThrottle.BoolVal;
                 c.PauseProjectiles = _pauseProjectiles.BoolVal;
                 c.CachePointerOverUi = _cachePointerOverUi.BoolVal;
-                c.PowerButtonsThrottle = _powerButtonsThrottle.BoolVal;
                 c.WorldAgeUiThrottle = _worldAgeUiThrottle.BoolVal;
                 c.SkipDuplicateStatus = _skipDuplicateStatus.BoolVal;
 

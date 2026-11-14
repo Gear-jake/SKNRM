@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.2.3
+
+- **修复权能栏无法滚动**：移除 `PowersTab.update` 与 `PowerButtonSelector.updateTopButtons` 两个节流补丁。
+  前者每 15 帧强制 `sortButtons()+setNewWidth()`，会不断重置滚动位置，导致权能栏滚不动。
+  这两项本来收益就极小（<0.5ms），删除后 UI 行为完全回到原版。
+- 清理对应配置项（`PowersTabThrottle` / `PowerButtonsThrottle`）与 F7 条目。
+- 性能增强补丁：10 → 8 项。
+
 ## 1.2.2
 
 - **修复 1.2.0 引入的帧率回退**：征兵放宽条件收紧为「城市缺员 ≥2 **且** 该市民确实没有工作」，

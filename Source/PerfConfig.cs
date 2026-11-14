@@ -216,10 +216,8 @@ namespace SKNRM
         public bool MapLayerThrottle = true;      // 地图层绘制节流
         public bool VisibleActorsThrottle = true; // 可见对象重算节流（渲染数据预处理）
         public int VisibleActorsStride = 2;   // 实测 2 最好（3 反而更慢）       // 每 N 帧算一次可见对象
-        public bool PowersTabThrottle = true;     // 权能标签每 15 帧刷新
         public bool PauseProjectiles = true;      // 暂停时冻结投射物
         public bool CachePointerOverUi = true;    // 鼠标没动时复用 UI 命中结果
-        public bool PowerButtonsThrottle = true;  // 权能按钮栏每 10 帧更新
         public bool WorldAgeUiThrottle = true;    // 纪元卡片每 5 帧刷新
         public bool SkipDuplicateStatus = true;   // 跳过重复添加的状态（溺水等）
 
