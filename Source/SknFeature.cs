@@ -504,6 +504,7 @@ namespace SKNRM
         internal static bool ShouldSkipThisFrame(Actor actor)
         {
             if (!ShouldFreeze(actor)) return false;
+            if (BulkGuard.Active) return false;   // 大规模清除/重建期间不节流
             int n = EffectiveThrottleFrames();
 
             // ── 征兵/战争放宽（精准版）──

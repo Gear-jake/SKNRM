@@ -1,4 +1,6 @@
 using System;
+using System.Reflection;
+using HarmonyLib;
 using System.Threading;
 using UnityEngine;
 
@@ -115,6 +117,7 @@ namespace SKNRM
         private int _hitchLastG0, _hitchLastG2;
 
         private bool _gcDeferActive;
+        private float _pausedSince = -1f;
         private long _gcDeferBaseMb;
 
         private static bool _heapBaselineLogged;
@@ -155,6 +158,7 @@ namespace SKNRM
                 GcDeferTick();
                 HeapBaselineOnce();
                 AutoLoadTick(dt);
+                BulkGuard.Tick(dt);
                 _fpsTimer += dt;
                 PerfSettings.SyncFromConfig();
                 if (_fpsTimer >= 1f) { _fpsTimer = 0f; PerfBoost.ApplyFrameRate(); }
@@ -199,6 +203,7 @@ namespace SKNRM
                 PerfStats.OnException(e);
             }
         }
+
 
         private void AutoLoadTick(float dt)
         {
@@ -314,7 +319,10 @@ namespace SKNRM
                     {
                         bool paused;
                         try { paused = Config.paused; } catch { paused = false; }
-                        if (!paused) return;
+                        if (!paused) { _pausedSince = -1f; return; }
+                        if (_pausedSince < 0f) _pausedSince = Time.unscaledTime;
+                        // 只对"玩家主动暂停"回收：短暂停多半是别的模组在做批量操作（清除/重建）
+                        if (Time.unscaledTime - _pausedSince < 3f) return;
                     }
                 }
 

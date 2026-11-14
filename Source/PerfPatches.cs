@@ -306,6 +306,7 @@ namespace SKNRM
                     if (months <= cfg.UppCityAgeMonths) return;
                 }
 
+                if (BulkGuard.Active) { UppDispatcher.NoteAllowed(__instance); return; }   // 大规模清除/重建期间城市全速
                 if (__instance.timer_action > 0f) return; // 原版自己就会节流，不重复干预
 
                 // 城市级硬保护：有军队 / 正在被围攻 / 首都 / 王国在打仗 —— 不参与轮转节流

@@ -221,6 +221,10 @@ namespace SKNRM
         public bool WorldAgeUiThrottle = true;    // 纪元卡片每 5 帧刷新
         public bool SkipDuplicateStatus = true;   // 跳过重复添加的状态（溺水等）
 
+        // 大规模变更保护：清除/重建（如天工技艺的“清除”）期间暂停 GC 择机并关闭节流
+        public bool BulkChangeGuard = true;
+        public float BulkChangeSeconds = 5f;
+
         // 地图层绘制步长（越大越省，但画面会顿）：ZoneCalculator / UnitLayer 分别控制
         public int MapLayerStrideZone = 2;
         public int MapLayerStrideUnit = 4;

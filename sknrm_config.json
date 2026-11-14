@@ -69,5 +69,7 @@
     "CachePointerOverUi":  true,
     "PowerButtonsThrottle":  true,
     "WorldAgeUiThrottle":  true,
-    "SkipDuplicateStatus":  true
+    "SkipDuplicateStatus":  true,
+    "BulkChangeGuard":  true,
+    "BulkChangeSeconds":  5
 }
