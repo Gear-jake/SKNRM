@@ -45,6 +45,11 @@ namespace SKNRM
 
         internal static int Patch(HarmonyLib.Harmony harmony, Type type, string method, Type[] args,
             string prefixName, string postfixName, string label)
+            => Patch(harmony, typeof(Guards), type, method, args, prefixName, postfixName, label);
+
+        /// <summary>通用补丁帮助：owner 是前缀/后缀方法所在的类（Guards 或 PerfBoost）。</summary>
+        internal static int Patch(HarmonyLib.Harmony harmony, Type owner, Type type, string method, Type[] args,
+            string prefixName, string postfixName, string label)
         {
             try
             {
@@ -55,8 +60,8 @@ namespace SKNRM
                     return 0;
                 }
                 harmony.Patch(target,
-                    prefix: prefixName == null ? null : new HarmonyMethod(typeof(Guards), prefixName),
-                    postfix: postfixName == null ? null : new HarmonyMethod(typeof(Guards), postfixName));
+                    prefix: prefixName == null ? null : new HarmonyMethod(owner, prefixName),
+                    postfix: postfixName == null ? null : new HarmonyMethod(owner, postfixName));
                 return 1;
             }
             catch (Exception e)

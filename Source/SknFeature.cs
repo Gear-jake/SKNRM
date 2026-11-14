@@ -507,44 +507,38 @@ namespace SKNRM
             if (BulkGuard.Active) return false;   // 大规模清除/重建期间不节流
             int n = EffectiveThrottleFrames();
 
-            // ── 征兵/战争放宽（精准版）──
-            // 招募与"找工作"都是决策（find_city_job 等），跑在被节流的 b6 里；
-            // 但把所有空闲市民都放宽会明显吃 CPU，所以只放宽真正需要征兵的那批：
-            //   ① 所在城市战士名额没满 → 用 JobSeekerThrottle（默认 2）
-            //   ② 否则若王国在打仗 → 用 WarCivilianThrottle（默认 2）
+            // ── 征兵放宽（严格版）──
+            // 只对"真正在等工作的市民 + 城市确实缺战士"放宽，否则会把大量市民的 AI 从 1/8 提到 1/2，
+            // 直接把帧率打回去（实测 6.7k 单位从 ~60fps 掉到 ~32fps 就是这个原因）。
             if (n > 2)
             {
-                bool needsWarrior = false;
                 try
                 {
                     City c = actor.city;
+                    int deficit = 0;
                     if (c != null && c.status != null)
-                        needsWarrior = c.status.warriors_current < c.status.warrior_slots;
-                }
-                catch { }
+                        deficit = c.status.warrior_slots - c.status.warriors_current;
 
-                if (needsWarrior)
-                {
-                    int seekerN = PerfConfig.I.JobSeekerThrottle;
-                    if (seekerN > 1 && seekerN < n)
+                    if (deficit >= 2 && actor.citizen_job == null)
                     {
-                        n = seekerN;
-                        PerfStats.Skip(ref PerfStats.JobSeekerBoost);
+                        int seekerN = PerfConfig.I.JobSeekerThrottle;
+                        if (seekerN > 1 && seekerN < n)
+                        {
+                            n = seekerN;
+                            PerfStats.Skip(ref PerfStats.JobSeekerBoost);
+                        }
                     }
-                }
-                else
-                {
-                    try
+                    else if (deficit >= 2 && PerfConfig.I.WarCivilianThrottle > 1 && IsKingdomAtWar(actor.kingdom))
                     {
                         int warN = PerfConfig.I.WarCivilianThrottle;
-                        if (warN > 1 && warN < n && IsKingdomAtWar(actor.kingdom))
+                        if (warN > 1 && warN < n)
                         {
                             n = warN;
                             PerfStats.Skip(ref PerfStats.WarCivilianBoost);
                         }
                     }
-                    catch { }
                 }
+                catch { }
             }
             if (n <= 1) return true;
 

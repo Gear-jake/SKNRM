@@ -173,11 +173,11 @@ namespace SKNRM
         public bool UppProtectWarCities = true;
 
         /// <summary>交战王国平民的节流周期（比平时的 SknThrottleFrames 更宽松，保证征兵与后勤）。0 或 1 = 不节流。</summary>
-        public int WarCivilianThrottle = 2;
+        public int WarCivilianThrottle = 4;
 
         /// <summary>还没分到工作（citizen_job == null）的市民节流周期。这类市民正是征兵/分派的对象，
         /// 而"找工作"本身是一条决策（find_city_job），跑在被节流的 b6 里，所以必须放宽。</summary>
-        public int JobSeekerThrottle = 2;
+        public int JobSeekerThrottle = 4;
 
         /// <summary>UPP 饥饿保护：某城连续被拒绝思考超过这么多帧就强制放行一次（0=关闭）。</summary>
         public int UppCityMaxDenyFrames = 20;
@@ -212,8 +212,10 @@ namespace SKNRM
         public bool UnlockVsync = true;           // 同时关闭垂直同步，否则仍被刷新率限制
         public bool ShowFpsCounter = true;        // 左上角 FPS 显示
         public bool FpsIndependentSpeed = true;   // 高帧率不改变游戏速度
-        public bool QuantumSpriteThrottle = true; // 量子精灵分级跳帧（收益最大的一项）
+        public bool QuantumSpriteThrottle = false; // 图标跳帧（实测反而更慢，默认关）
         public bool MapLayerThrottle = true;      // 地图层绘制节流
+        public bool VisibleActorsThrottle = true; // 可见对象重算节流（渲染数据预处理）
+        public int VisibleActorsStride = 2;   // 实测 2 最好（3 反而更慢）       // 每 N 帧算一次可见对象
         public bool PowersTabThrottle = true;     // 权能标签每 15 帧刷新
         public bool PauseProjectiles = true;      // 暂停时冻结投射物
         public bool CachePointerOverUi = true;    // 鼠标没动时复用 UI 命中结果

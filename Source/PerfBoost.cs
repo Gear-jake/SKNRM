@@ -83,26 +83,28 @@ namespace SKNRM
         internal static void Install(HarmonyLib.Harmony harmony)
         {
             int ok = 0;
-            ok += Guards.Patch(harmony, typeof(MapBox), "calculateCurElapsed", Type.EmptyTypes,
+            ok += Guards.Patch(harmony, typeof(PerfBoost), typeof(MapBox), "calculateCurElapsed", Type.EmptyTypes,
                 nameof(CurElapsedPrefix), null, "高帧率不改游戏速度");
-            ok += Guards.Patch(harmony, typeof(QuantumSpriteManager), "updateSystems", Type.EmptyTypes,
+            ok += Guards.Patch(harmony, typeof(PerfBoost), typeof(ActorManager), "calculateVisibleActors", Type.EmptyTypes,
+                nameof(VisibleActorsPrefix), nameof(VisibleActorsPostfix), "可见对象重算节流");
+            ok += Guards.Patch(harmony, typeof(PerfBoost), typeof(QuantumSpriteManager), "updateSystems", Type.EmptyTypes,
                 nameof(QuantumSpritePrefix), null, "图标/粒子跳帧");
-            ok += Guards.Patch(harmony, typeof(MapLayer), "draw", new[] { typeof(float) }, nameof(LayerDrawPrefix), nameof(LayerDrawPostfix), "地图层绘制节流");
+            ok += Guards.Patch(harmony, typeof(PerfBoost), typeof(MapLayer), "draw", new[] { typeof(float) }, nameof(LayerDrawPrefix), nameof(LayerDrawPostfix), "地图层绘制节流");
 
-            ok += Guards.Patch(harmony, typeof(PowersTab), "update", Type.EmptyTypes,
+            ok += Guards.Patch(harmony, typeof(PerfBoost), typeof(PowersTab), "update", Type.EmptyTypes,
                 nameof(PowersTabPrefix), null, "权能标签节流");
-            ok += Guards.Patch(harmony, typeof(ProjectileManager), "update", new[] { typeof(float) },
+            ok += Guards.Patch(harmony, typeof(PerfBoost), typeof(ProjectileManager), "update", new[] { typeof(float) },
                 nameof(ProjectilePausePrefix), null, "暂停冻结投射物");
-            ok += Guards.Patch(harmony, typeof(PlayerControl), "isPointerOverUIButton", Type.EmptyTypes,
+            ok += Guards.Patch(harmony, typeof(PerfBoost), typeof(PlayerControl), "isPointerOverUIButton", Type.EmptyTypes,
                 nameof(PointerPrefix), nameof(PointerPostfix), "鼠标命中缓存");
-            ok += Guards.Patch(harmony, typeof(PowerButtonSelector), "updateTopButtons", Type.EmptyTypes,
+            ok += Guards.Patch(harmony, typeof(PerfBoost), typeof(PowerButtonSelector), "updateTopButtons", Type.EmptyTypes,
                 nameof(PowerButtonsPrefix), null, "权能按钮栏节流");
-            ok += Guards.Patch(harmony, typeof(UiWorldAgeInfo), "Update", Type.EmptyTypes,
+            ok += Guards.Patch(harmony, typeof(PerfBoost), typeof(UiWorldAgeInfo), "Update", Type.EmptyTypes,
                 nameof(WorldAgeUiPrefix), null, "纪元卡片节流");
-            ok += Guards.Patch(harmony, typeof(Actor), "addStatusEffect",
+            ok += Guards.Patch(harmony, typeof(PerfBoost), typeof(Actor), "addStatusEffect",
                 new[] { typeof(StatusAsset), typeof(float), typeof(bool) },
                 nameof(AddStatusPrefix), null, "重复状态跳过");
-            Log.Info("性能增强补丁安装 " + ok + "/9（帧率/图标跳帧/地图层/标签/投射物/鼠标/按钮栏/纪元卡/重复状态）");
+            Log.Info("性能增强补丁安装 " + ok + "/10（帧率/可见对象/图标跳帧/地图层/标签/投射物/鼠标/按钮栏/纪元卡/重复状态）");
         }
 
         // ── ① 高帧率不影响游戏速度 ──
@@ -117,6 +119,32 @@ namespace SKNRM
                 return false;
             }
             catch (Exception e) { PerfStats.OnException(e); return true; }
+        }
+
+        // ── 可见对象重算（渲染数据预处理）节流 ──
+        // 这是 8000 单位时“其它”耗时的大头：每帧对全部可见单位并行算一次渲染数据。
+        // 单位位置晚一帧更新肉眼看不出，但能省下可观时间。
+        internal static long VisibleTicks;
+        private static int _visibleFrame = -1;
+
+        private static bool VisibleActorsPrefix(ref long __state)
+        {
+            __state = 0L;
+            if (!PerfConfig.I.VisibleActorsThrottle) return true;
+            int stride = PerfConfig.I.VisibleActorsStride;
+            if (stride > 1 && (Time.frameCount % stride) == 0)
+            {
+                PerfStats.Skip(ref PerfStats.VisibleSkipped);
+                return false;
+            }
+            __state = System.Diagnostics.Stopwatch.GetTimestamp();
+            return true;
+        }
+
+        private static void VisibleActorsPostfix(long __state)
+        {
+            if (__state == 0L) return;
+            System.Threading.Interlocked.Add(ref VisibleTicks, System.Diagnostics.Stopwatch.GetTimestamp() - __state);
         }
 
         // ── ② 图标/粒子跳帧 ──

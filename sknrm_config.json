@@ -50,8 +50,8 @@
     "LogEverySeconds":  30.0,
     "Verbose":  false,
     "UppProtectWarCities":  true,
-    "WarCivilianThrottle":  2,
-    "JobSeekerThrottle":  2,
+    "WarCivilianThrottle":  4,
+    "JobSeekerThrottle":  4,
     "AutoLoadSaveFolder":  "",
     "AutoLoadAfterSeconds":  10,
     "UnlockFrameRate":  true,
@@ -59,7 +59,7 @@
     "UnlockVsync":  true,
     "ShowFpsCounter":  true,
     "FpsIndependentSpeed":  true,
-    "QuantumSpriteThrottle":  true,
+    "QuantumSpriteThrottle":  false,
     "MapLayerThrottle":  true,
     "MapLayerStrideZone":  2,
     "MapLayerStrideUnit":  4,
@@ -71,5 +71,7 @@
     "WorldAgeUiThrottle":  true,
     "SkipDuplicateStatus":  true,
     "BulkChangeGuard":  true,
-    "BulkChangeSeconds":  5
+    "BulkChangeSeconds":  5,
+    "VisibleActorsThrottle":  true,
+    "VisibleActorsStride":  2
 }

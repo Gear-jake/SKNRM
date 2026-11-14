@@ -29,6 +29,7 @@ namespace SKNRM
         internal static long ProtectedArmy;     // 军队相关被保护
         internal static long ProtectedWar;      // 王国在打仗被保护
         internal static long WarriorsMade;      // 征兵成功次数
+        internal static long VisibleSkipped;     // 可见对象重算被跳过
         internal static long LayerDrawSkipped;   // 地图层绘制被跳过的次数
         internal static long PointerCacheHits;  // 鼠标命中缓存复用次数
         internal static long PowerButtonsSkipped;
