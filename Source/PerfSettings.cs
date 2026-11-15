@@ -1,3 +1,4 @@
+using System;
 using NeoModLoader.api;
 using NeoModLoader.General;
 
@@ -107,9 +108,14 @@ namespace SKNRM
                 LM.AddToCurrentLocale("world_age_ui_throttle Description", "纪元/年份卡片每 5 帧刷新一次。");
                 LM.AddToCurrentLocale("skip_duplicate_status", "重复状态跳过");
                 LM.AddToCurrentLocale("skip_duplicate_status Description", "溺水等状态已存在时不再重复添加（原版每帧重加）。");
+                // 旧版遗留 id 的本地化兜底：对应补丁已移除，仅用于避免 NML 报 missing text
+                LM.AddToCurrentLocale("powers_tab_throttle", "（已移除）权能标签节流");
+                LM.AddToCurrentLocale("power_buttons_throttle", "（已移除）权能按钮栏节流");
+
                 LM.AddToCurrentLocale("verbose", "详细日志");
                 LM.AddToCurrentLocale("verbose Description", "逐条打印补丁安装与打标结果。");
 
+                PruneStale(config);
                 Ready = true;
                 Log.Info("NML 设置页已注册（分组 sknrm，" + RegisteredCount + " 个开关）；数值项仍走 sknrm_config.json");
             }
@@ -126,6 +132,7 @@ namespace SKNRM
         /// 并且可能让 ModConfig 内部状态不一致（打开设置窗口时 NRE）。
         /// </summary>
         private static int _registered;
+        private static readonly System.Collections.Generic.HashSet<string> _ids = new System.Collections.Generic.HashSet<string>();
 
         internal static int RegisteredCount { get { return _registered; } }
 
@@ -148,12 +155,41 @@ namespace SKNRM
                 if (dict != null && dict.Contains(id))
                 {
                     var existing = dict[id] as ModConfigItem;
-                    if (existing != null) { _registered++; return existing; }
+                    if (existing != null) { _registered++; _ids.Add(id); return existing; }
                 }
             }
             catch { }
             _registered++;
+            _ids.Add(id);
             return config.AddConfigItem(Group, id, type, defaultValue);
+        }
+        /// <summary>
+        /// 清掉配置里"本版本已不再注册"的旧项（例如早期版本的 powers_tab_throttle / power_buttons_throttle）。
+        /// 不清的话，NML 打开设置窗口时会去查这些 id 的本地化文本，找不到就抛
+        /// `LocalizedTextManager: missing text: xxx`。
+        /// </summary>
+        private static void PruneStale(ModConfig config)
+        {
+            try
+            {
+                var group = GetGroup(config);
+                if (group == null) return;
+                var stale = new System.Collections.Generic.List<object>();
+                foreach (object key in group.Keys)
+                {
+                    string id = key as string;
+                    if (id != null && !_ids.Contains(id)) stale.Add(key);
+                }
+                for (int i = 0; i < stale.Count; i++)
+                {
+                    group.Remove(stale[i]);
+                    Log.Info("已清理旧版设置项：" + stale[i]);
+                }
+            }
+            catch (Exception e)
+            {
+                Log.Warn("清理旧设置项失败（不影响使用）：" + e.Message);
+            }
         }
         /// <summary>每秒把 NML 设置页里的开关同步到运行期配置（NML 配置项没有回调，轮询最省事）。</summary>
         internal static void SyncFromConfig()

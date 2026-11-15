@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.4.8
+
+- **修复打开模组设置报错** `LocalizedTextManager: missing text: powers_tab_throttle / power_buttons_throttle`：
+  这两个开关在 1.2.3 已被移除，但旧存档的 NML 配置里仍留着它们，打开设置窗口时查不到本地化文本就报错。
+  现在注册完成后会**自动清理本版本已不再注册的旧项**，并额外为这两个旧 id 保留本地化兜底。
+- 修 `HarmonyUtil.ShouldBackOff` 传错目标类型导致的 HarmonyX 警告（不影响补丁本身）。
+
 ## 1.4.7
 
 - **修复军队"乱转"**：`b3_findEnemyTarget` 从逻辑 job 分帧列表移除（目标选择恢复每帧），
