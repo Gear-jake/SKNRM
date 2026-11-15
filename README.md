@@ -363,3 +363,19 @@ Re-EarlyMordenWar 的 10 个重叠点：
 - 少数仍占用公共方法的优化（可见对象、job 分帧、名牌 LOD、饥饿停摆、寻敌相位）全部带
   **自动共存检查**：检测到别人的补丁就自动让路并在日志列出；
 - 想彻底避免任何冲突，可以把这些开关关掉，只保留 `AiSystemActor.update` 这一层的 AI 节流。
+---
+
+## 13. 手机版（不适用）
+
+**本模组只支持 PC 版（Steam / owl，build 719），手机版无法使用。**
+
+| 阻断点 | 说明 |
+|---|---|
+| 加载器 | 本模组是 NeoModLoader 源码模组；NML 只有 PC 版，移动端没有对应加载器 |
+| 运行时 | 移动版是 IL2CPP 构建，Harmony 无法在运行时改写 IL，补丁机制整个不成立 |
+| 元数据 | 本模组需要读取游戏私有字段（如 `AiSystemActor.ai_object`），IL2CPP 裁剪后会失败 |
+| 版本门 | `mod.json` 声明 `targetGameBuild: 719`，移动端构建号不同，加载器会直接拒绝 |
+| 桌面专属 API | `QualitySettings.vSyncCount` 在移动端无效；`Input.mousePosition` 在触屏上只有最后触点，鼠标缓存会长期命中旧值 |
+
+如果要在移动端做同类优化，需要**另起一个 IL2CPP 插件工程**（BepInEx IL2CPP / MelonLoader），
+把 Harmony 换成 IL2CPP hook、把反射换成 il2cpp 元数据访问 —— 那不是本模组加一个开关能解决的。
