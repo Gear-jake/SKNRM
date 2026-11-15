@@ -363,6 +363,14 @@ namespace SKNRM
             if (!asset.has_ai_system) return false;
             if (asset.is_boat) return false;
 
+            // ── 硬保护：非文明单位（动物/怪物）永不节流 ──
+            // 它们数量少、开销低，但"原地抽动/不干活"的观感极差，收益远小于代价。
+            if (!asset.civ) return false;
+
+            // ── 硬保护：正在赶路的单位永不节流 ──
+            // 有移动目标却跳过 ai.update() 时，路径与决策不同步，表现就是来回蠕动。
+            try { if (actor.beh_tile_target != null) return false; } catch { }
+
             // ── 硬保护 0：关键单位永不冻结（国王 / 城市领袖 / 军队队长 / 军队成员）──
             // 这几类一旦被跳过 AI，表现就是"国王、村长、军队一动不动"，代价远大于收益。
             if (IsEssentialActor(actor)) return false;

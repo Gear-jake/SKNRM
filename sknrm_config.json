@@ -70,11 +70,11 @@
     "SkipDuplicateStatus":  true,
     "BulkChangeGuard":  true,
     "BulkChangeSeconds":  5,
-    "VisibleActorsThrottle":  true,
     "VisibleActorsStride":  2,
     "SknPopulationThreshold":  1000,
     "MapLayerStrideDebugCursor":  4,
     "MapLayerStrideFlashLayer":  2,
     "AlignIconsWithUnits":  true,
-    "SafeMode":  false
+    "SafeMode":  false,
+    "VisibleActorsThrottle":  false
 }

@@ -214,7 +214,7 @@ namespace SKNRM
         public bool FpsIndependentSpeed = true;   // 高帧率不改变游戏速度
         public bool QuantumSpriteThrottle = false; // 图标跳帧（实测反而更慢，默认关）
         public bool MapLayerThrottle = true;      // 地图层绘制节流
-        public bool VisibleActorsThrottle = true;
+        public bool VisibleActorsThrottle = false;
         /// <summary>安全模式：一键关掉所有会改变玩法节拍的节流（城市轮转 / AI 节流 / 逻辑 job 分帧 / 寻敌相位）。</summary>
         public bool SafeMode = false;
         public bool AlignIconsWithUnits = true;    // 图标与单位本体同相位刷新（防止图标比人物快一帧、看起来不跟随） // 可见对象重算节流（渲染数据预处理）
