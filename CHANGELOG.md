@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.5.2（文明单位"蠕动不干活"）
+
+根因不是 AI 节流（人口 417 时闸门本就关着），而是**两个不受人口闸门控制的降频**：
+
+- **逻辑 job 分帧**：`b6_0_updateDecision`（决策）、`b4_checkTaskVerifier`（任务校验）、
+  `b2_checkCurrentEnemyTarget`、`b5`? 等**决策/任务类** job 被按 1/3 帧跳过 → 单位每帧都在
+  "决定→被打断→再决定"，表现就是原地蠕动、不推进工作。
+- **城市轮转（UPP）**：同样不看人口，小图上也在拒绝城市 AI → 国王/村长/军队拿不到指令。
+
+修复：
+
+1. **job 分帧与城市轮转都改为受人口闸门控制**：`单位数 <= 人口阈值` 时完全按原版跑；
+2. **job 列表裁剪为纯模拟类**：`updateStats`、`updateNutritionDecay`、`u6_checkFrozen`、
+   `u8_checkUpdateTimers`、`u7_checkAugmentationEffects`、`updateEventsBecomeAdult`、`updateEventsEggHatched`
+   （决策/任务/寻敌/死亡判定/地块动作全部移出分帧）；
+3. 上一版已加：动物不节流、赶路中单位不节流、可见对象节流默认关。
+
 ## 1.5.1
 
 - **修复"生物原地蠕动/不干活"**：

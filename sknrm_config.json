@@ -76,5 +76,6 @@
     "MapLayerStrideFlashLayer":  2,
     "AlignIconsWithUnits":  true,
     "SafeMode":  false,
-    "VisibleActorsThrottle":  false
+    "VisibleActorsThrottle":  false,
+    "SknLogicJobs":  "updateStats,updateNutritionDecay,u6_checkFrozen,u8_checkUpdateTimers,u7_checkAugmentationEffects,updateEventsBecomeAdult,updateEventsEggHatched"
 }

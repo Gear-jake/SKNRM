@@ -84,7 +84,7 @@ namespace SKNRM
         // 自动化测试用：启动后自动加载指定存档文件夹（留空=关闭）
 
         /// <summary>参与分帧的逻辑 job 名单（BatchActors 的方法名，逗号分隔）。</summary>
-        public string SknLogicJobs = "updateStats,updateNutritionDecay,u1_checkInside,u4_deadCheck,u5_curTileAction,u6_checkFrozen,u7_checkAugmentationEffects,u8_checkUpdateTimers,b1_checkUnderForce,b2_checkCurrentEnemyTarget,b4_checkTaskVerifier,b55_updateNaturalDeaths,b6_0_updateDecision,updateEventsBecomeAdult,updateEventsEggHatched";
+        public string SknLogicJobs = "updateStats,updateNutritionDecay,u6_checkFrozen,u8_checkUpdateTimers,u7_checkAugmentationEffects,updateEventsBecomeAdult,updateEventsEggHatched";
 
         /// <summary>角色管线步长的分母：步长 = 人口 / 这个数（上限 SknActorStrideMax）。默认 1000 → 3000 人时步长 3、4000 人时 4。</summary>
         public int SknActorStrideDivisor = 1000;

@@ -61,6 +61,8 @@ namespace SKNRM
         {
             try
             {
+                // 人口未达阈值时完全按原版跑：小图上对决策类 job 分帧会让单位看起来蠕动/不干活
+                if (!SknFeature.MasterGateOpen()) return true;
                 int n = PerfConfig.I.SknLogicJobStride;
                 if (n <= 1) return true;
                 bool run = (UnityEngine.Time.frameCount % n) == 0;

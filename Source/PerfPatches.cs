@@ -223,6 +223,7 @@ namespace SKNRM
                 PerfStats.Skip(ref PerfStats.CityUpdateCalls);
                 var cfg = PerfConfig.I;
                 if (!cfg.Unfair) return;
+                if (!SknFeature.MasterGateOpen()) return;   // 人口未达阈值：城市轮转同样不介入
                 if (UppDispatcher.ForceRefresh > 0) return;
                 if (__instance == null || __instance.ai == null) return;
 
