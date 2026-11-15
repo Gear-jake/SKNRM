@@ -84,7 +84,7 @@ namespace SKNRM
         // 自动化测试用：启动后自动加载指定存档文件夹（留空=关闭）
 
         /// <summary>参与分帧的逻辑 job 名单（BatchActors 的方法名，逗号分隔）。</summary>
-        public string SknLogicJobs = "updateStats,updateNutritionDecay,u1_checkInside,u4_deadCheck,u5_curTileAction,u6_checkFrozen,u7_checkAugmentationEffects,u8_checkUpdateTimers,b1_checkUnderForce,b2_checkCurrentEnemyTarget,b3_findEnemyTarget,b4_checkTaskVerifier,b5_checkPathMovement,b55_updateNaturalDeaths,b6_0_updateDecision,updateEventsBecomeAdult,updateEventsEggHatched";
+        public string SknLogicJobs = "updateStats,updateNutritionDecay,u1_checkInside,u4_deadCheck,u5_curTileAction,u6_checkFrozen,u7_checkAugmentationEffects,u8_checkUpdateTimers,b1_checkUnderForce,b2_checkCurrentEnemyTarget,b3_findEnemyTarget,b4_checkTaskVerifier,b55_updateNaturalDeaths,b6_0_updateDecision,updateEventsBecomeAdult,updateEventsEggHatched";
 
         /// <summary>角色管线步长的分母：步长 = 人口 / 这个数（上限 SknActorStrideMax）。默认 1000 → 3000 人时步长 3、4000 人时 4。</summary>
         public int SknActorStrideDivisor = 1000;
@@ -98,7 +98,7 @@ namespace SKNRM
 
         /// <summary>士兵（军队成员但非队长）在"队长没在打仗"时的节流周期：默认 8，等于行军/待命期间几乎不思考，
         /// 只保留跟随与移动。队长一旦进入战斗，自动回落到 ArmyThrottleFrames（默认 2）。</summary>
-        public int ArmyIdleThrottle = 8;
+        public int ArmyIdleThrottle = 4;
 
         /// <summary>刚载入世界后的"宽限加速"秒数：这段时间内全局限流加倍（默认 12 秒），避免读大存档时前几帧 2–3 秒卡死。</summary>
         public float LoadGraceSeconds = 12f;

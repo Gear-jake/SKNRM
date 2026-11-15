@@ -221,6 +221,22 @@ namespace SKNRM
             }
         }
 
+        /// <summary>关键单位：国王 / 城市领袖 / 军队队长 / 任何在军队里的单位 —— 永不节流。</summary>
+        private static bool IsEssentialActor(Actor actor)
+        {
+            try
+            {
+                if (actor.isKing()) return true;
+                if (actor.isCityLeader()) return true;
+                City c = actor.city;
+                if (c != null && c.leader != null && ReferenceEquals(c.leader, actor)) return true;
+                if (IsProtectedCaptain(actor)) return true;
+                if (actor.hasArmy() || actor.isWarrior()) return true;
+            }
+            catch { }
+            return false;
+        }
+
         private static bool SafeIsFighting(Actor actor)
         {
             try { return actor != null && actor.isFighting(); } catch { return true; }
@@ -346,6 +362,15 @@ namespace SKNRM
             if (asset == null) return false;
             if (!asset.has_ai_system) return false;
             if (asset.is_boat) return false;
+
+            // ── 硬保护 0：关键单位永不冻结（国王 / 城市领袖 / 军队队长 / 军队成员）──
+            // 这几类一旦被跳过 AI，表现就是"国王、村长、军队一动不动"，代价远大于收益。
+            if (IsEssentialActor(actor)) return false;
+
+            // ── 硬保护 0.5：正在执行动作的单位不跳 ──
+            // 跳过 ai.update() 会同时掐掉"动作推进"，一旦单位正处于某个动作里（走路/砍树/搬运/战斗），
+            // 表现就是"一动不动"。所以只节流"动作之间"的单位，动作执行一律每帧跑。
+            try { if (actor.ai != null && actor.ai.action != null) return false; } catch { }
 
             var cfg = PerfConfig.I;
 

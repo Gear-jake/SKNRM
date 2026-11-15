@@ -14,7 +14,7 @@
     "ProtectArmies":  true,
     "ArmyProtectMode":  1,
     "ArmyThrottleFrames":  4,
-    "ArmyIdleThrottle":  8,
+    "ArmyIdleThrottle":  4,
     "ArmyIdleNoScan":  true,
     "ProtectAtWar":  true,
     "WarProtectScope":  2,
