@@ -84,7 +84,7 @@ namespace SKNRM
         // 自动化测试用：启动后自动加载指定存档文件夹（留空=关闭）
 
         /// <summary>参与分帧的逻辑 job 名单（BatchActors 的方法名，逗号分隔）。</summary>
-        public string SknLogicJobs = "updateStats,updateNutritionDecay,u1_checkInside,u4_deadCheck,u5_curTileAction,u6_checkFrozen,u7_checkAugmentationEffects,u8_checkUpdateTimers,b1_checkUnderForce,b2_checkCurrentEnemyTarget,b3_findEnemyTarget,b4_checkTaskVerifier,b55_updateNaturalDeaths,b6_0_updateDecision,updateEventsBecomeAdult,updateEventsEggHatched";
+        public string SknLogicJobs = "updateStats,updateNutritionDecay,u1_checkInside,u4_deadCheck,u5_curTileAction,u6_checkFrozen,u7_checkAugmentationEffects,u8_checkUpdateTimers,b1_checkUnderForce,b2_checkCurrentEnemyTarget,b4_checkTaskVerifier,b55_updateNaturalDeaths,b6_0_updateDecision,updateEventsBecomeAdult,updateEventsEggHatched";
 
         /// <summary>角色管线步长的分母：步长 = 人口 / 这个数（上限 SknActorStrideMax）。默认 1000 → 3000 人时步长 3、4000 人时 4。</summary>
         public int SknActorStrideDivisor = 1000;
@@ -124,7 +124,7 @@ namespace SKNRM
         public bool EnemyPeacefulRangeZero = true;
 
         /// <summary>寻敌（b3_findEnemyTarget）的相位轮转周期：按 actor id 打散，让同一帧要扫描的单位摊到 N 帧。1=原版节拍。</summary>
-        public int EnemyPhaseFrames = 5;
+        public int EnemyPhaseFrames = 1;
 
         /// <summary>战士/军队/队长保持原版寻敌节拍（不参与相位轮转），保证交战反应。</summary>
         public bool EnemyKeepWarriorCadence = true;
@@ -215,6 +215,8 @@ namespace SKNRM
         public bool QuantumSpriteThrottle = false; // 图标跳帧（实测反而更慢，默认关）
         public bool MapLayerThrottle = true;      // 地图层绘制节流
         public bool VisibleActorsThrottle = true;
+        /// <summary>安全模式：一键关掉所有会改变玩法节拍的节流（城市轮转 / AI 节流 / 逻辑 job 分帧 / 寻敌相位）。</summary>
+        public bool SafeMode = false;
         public bool AlignIconsWithUnits = true;    // 图标与单位本体同相位刷新（防止图标比人物快一帧、看起来不跟随） // 可见对象重算节流（渲染数据预处理）
         public int VisibleActorsStride = 2;   // 实测 2 最好（3 反而更慢）       // 每 N 帧算一次可见对象
         public bool PauseProjectiles = true;      // 暂停时冻结投射物

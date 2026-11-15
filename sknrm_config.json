@@ -26,7 +26,7 @@
     "UppProtectArmyCities":  true,
     "UppProtectRecruitment":  true,
     "EnemyCacheFrames":  3,
-    "EnemyPhaseFrames":  5,
+    "EnemyPhaseFrames":  1,
     "EnemyPeacefulRangeZero":  true,
     "EnemyCivilianRangeZero":  true,
     "EnemyKeepWarriorCadence":  true,
@@ -75,5 +75,6 @@
     "SknPopulationThreshold":  1000,
     "MapLayerStrideDebugCursor":  4,
     "MapLayerStrideFlashLayer":  2,
-    "AlignIconsWithUnits":  true
+    "AlignIconsWithUnits":  true,
+    "SafeMode":  false
 }

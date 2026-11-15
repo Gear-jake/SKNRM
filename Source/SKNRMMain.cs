@@ -31,7 +31,8 @@ namespace SKNRM
                 }
 
                 PerfConfig.LoadFrom(dir);
-                PerfSettings.Init(GetConfig());
+                ApplySafeModeIfNeeded();
+            PerfSettings.Init(GetConfig());
 
                 HarmonyInstance = new HarmonyLib.Harmony("lead.SKNRM");
                 int installed = PerfPatches.InstallAll(HarmonyInstance);
@@ -61,6 +62,26 @@ namespace SKNRM
         }
 
         [Hotfixable]
+        /// <summary>安全模式：关掉所有会改变玩法节拍的优化，只保留渲染/UI 节流与防崩。</summary>
+        private static void ApplySafeModeIfNeeded()
+        {
+            try
+            {
+                var c = PerfConfig.I;
+                if (!c.SafeMode) return;
+                c.SknPlus = false;
+                c.Skn2 = false;
+                c.Unfair = false;
+                c.SknLogicJobStride = 1;
+                c.EnemyPhaseFrames = 1;
+                c.EnemyKeepWarriorCadence = true;
+                c.JobSeekerThrottle = 1;
+                c.WarCivilianThrottle = 1;
+                Log.Info("安全模式已启用：城市轮转/AI 节流/逻辑 job 分帧/寻敌相位 全部关闭（渲染与 UI 节流保留）");
+            }
+            catch (Exception e) { Log.Warn("安全模式应用失败：" + e.Message); }
+        }
+
         public void Reload()
         {
             try
