@@ -30,33 +30,33 @@ namespace SKNRM
                 }
 
                 var c = PerfConfig.I;
-                config.CreateGroup(Group);
+                try { config.CreateGroup(Group); } catch { /* 已存在（NML 从磁盘恢复）时忽略 */ }
 
-                _sknPlus = config.AddConfigItem(Group, "skn_plus", ConfigItemType.SWITCH, c.SknPlus);
-                _skn2 = config.AddConfigItem(Group, "skn2", ConfigItemType.SWITCH, c.Skn2);
-                _freezeNutrition = config.AddConfigItem(Group, "freeze_nutrition", ConfigItemType.SWITCH, c.FreezeNutrition);
-                _useLowResGate = config.AddConfigItem(Group, "use_lowres_gate", ConfigItemType.SWITCH, c.UseLowResGate);
-                _skipPathStart = config.AddConfigItem(Group, "skip_path_start", ConfigItemType.SWITCH, c.SkipPathStart);
-                _skipDecision = config.AddConfigItem(Group, "skip_decision", ConfigItemType.SWITCH, c.SkipDecision);
-                _unfair = config.AddConfigItem(Group, "unfair", ConfigItemType.SWITCH, c.Unfair);
-                _antiDrop = config.AddConfigItem(Group, "unfair_anti_drop", ConfigItemType.SWITCH, c.UnfairAntiDrop);
+                _sknPlus = GetOrAdd(config, "skn_plus", ConfigItemType.SWITCH, c.SknPlus);
+                _skn2 = GetOrAdd(config, "skn2", ConfigItemType.SWITCH, c.Skn2);
+                _freezeNutrition = GetOrAdd(config, "freeze_nutrition", ConfigItemType.SWITCH, c.FreezeNutrition);
+                _useLowResGate = GetOrAdd(config, "use_lowres_gate", ConfigItemType.SWITCH, c.UseLowResGate);
+                _skipPathStart = GetOrAdd(config, "skip_path_start", ConfigItemType.SWITCH, c.SkipPathStart);
+                _skipDecision = GetOrAdd(config, "skip_decision", ConfigItemType.SWITCH, c.SkipDecision);
+                _unfair = GetOrAdd(config, "unfair", ConfigItemType.SWITCH, c.Unfair);
+                _antiDrop = GetOrAdd(config, "unfair_anti_drop", ConfigItemType.SWITCH, c.UnfairAntiDrop);
 
-                _unlockFrameRate = config.AddConfigItem(Group, "unlock_frame_rate", ConfigItemType.SWITCH, c.UnlockFrameRate);
-                _displayFps = config.AddConfigItem(Group, "display_fps", ConfigItemType.SWITCH, c.ShowFpsCounter);
-                _fpsIndependentSpeed = config.AddConfigItem(Group, "fps_independent_speed", ConfigItemType.SWITCH, c.FpsIndependentSpeed);
-                _quantumThrottle = config.AddConfigItem(Group, "quantum_sprite_throttle", ConfigItemType.SWITCH, c.QuantumSpriteThrottle);
-                _mapLayerThrottle = config.AddConfigItem(Group, "map_layer_throttle", ConfigItemType.SWITCH, c.MapLayerThrottle);
-                _visibleActorsThrottle = config.AddConfigItem(Group, "visible_actors_throttle", ConfigItemType.SWITCH, c.VisibleActorsThrottle);
-                _guardProjectiles = config.AddConfigItem(Group, "guard_projectiles", ConfigItemType.SWITCH, c.GuardBadProjectiles);
-                _protectArmies = config.AddConfigItem(Group, "protect_armies", ConfigItemType.SWITCH, c.ProtectArmies);
-                _uppRecruitment = config.AddConfigItem(Group, "upp_protect_recruitment", ConfigItemType.SWITCH, c.UppProtectRecruitment);
-                _bulkGuard = config.AddConfigItem(Group, "bulk_change_guard", ConfigItemType.SWITCH, c.BulkChangeGuard);
-                _pauseProjectiles = config.AddConfigItem(Group, "pause_projectiles", ConfigItemType.SWITCH, c.PauseProjectiles);
-                _cachePointerOverUi = config.AddConfigItem(Group, "cache_pointer_ui", ConfigItemType.SWITCH, c.CachePointerOverUi);
-                _worldAgeUiThrottle = config.AddConfigItem(Group, "world_age_ui_throttle", ConfigItemType.SWITCH, c.WorldAgeUiThrottle);
-                _skipDuplicateStatus = config.AddConfigItem(Group, "skip_duplicate_status", ConfigItemType.SWITCH, c.SkipDuplicateStatus);
+                _unlockFrameRate = GetOrAdd(config, "unlock_frame_rate", ConfigItemType.SWITCH, c.UnlockFrameRate);
+                _displayFps = GetOrAdd(config, "display_fps", ConfigItemType.SWITCH, c.ShowFpsCounter);
+                _fpsIndependentSpeed = GetOrAdd(config, "fps_independent_speed", ConfigItemType.SWITCH, c.FpsIndependentSpeed);
+                _quantumThrottle = GetOrAdd(config, "quantum_sprite_throttle", ConfigItemType.SWITCH, c.QuantumSpriteThrottle);
+                _mapLayerThrottle = GetOrAdd(config, "map_layer_throttle", ConfigItemType.SWITCH, c.MapLayerThrottle);
+                _visibleActorsThrottle = GetOrAdd(config, "visible_actors_throttle", ConfigItemType.SWITCH, c.VisibleActorsThrottle);
+                _guardProjectiles = GetOrAdd(config, "guard_projectiles", ConfigItemType.SWITCH, c.GuardBadProjectiles);
+                _protectArmies = GetOrAdd(config, "protect_armies", ConfigItemType.SWITCH, c.ProtectArmies);
+                _uppRecruitment = GetOrAdd(config, "upp_protect_recruitment", ConfigItemType.SWITCH, c.UppProtectRecruitment);
+                _bulkGuard = GetOrAdd(config, "bulk_change_guard", ConfigItemType.SWITCH, c.BulkChangeGuard);
+                _pauseProjectiles = GetOrAdd(config, "pause_projectiles", ConfigItemType.SWITCH, c.PauseProjectiles);
+                _cachePointerOverUi = GetOrAdd(config, "cache_pointer_ui", ConfigItemType.SWITCH, c.CachePointerOverUi);
+                _worldAgeUiThrottle = GetOrAdd(config, "world_age_ui_throttle", ConfigItemType.SWITCH, c.WorldAgeUiThrottle);
+                _skipDuplicateStatus = GetOrAdd(config, "skip_duplicate_status", ConfigItemType.SWITCH, c.SkipDuplicateStatus);
 
-                _verbose = config.AddConfigItem(Group, "verbose", ConfigItemType.SWITCH, c.Verbose);
+                _verbose = GetOrAdd(config, "verbose", ConfigItemType.SWITCH, c.Verbose);
 
                 LM.AddToCurrentLocale(Group, "SKNRM 性能设置");
                 LM.AddToCurrentLocale("skn_plus", "平民 AI 跳过（SKN++）");
@@ -116,6 +116,27 @@ namespace SKNRM
             }
         }
 
+        /// <summary>
+        /// 取已有配置项，没有才创建。
+        /// NML 启动时会从 mods_config 里恢复上次保存的开关，如果我们再无条件 AddConfigItem，
+        /// 就会触发 "already exists ... Overwriting"，把用户上一局的设置覆盖回默认值，
+        /// 并且可能让 ModConfig 内部状态不一致（打开设置窗口时 NRE）。
+        /// </summary>
+        private static ModConfigItem GetOrAdd(ModConfig config, string id, ConfigItemType type, object defaultValue)
+        {
+            try
+            {
+                var getter = config.GetType().GetMethod("get_Item", new[] { typeof(string) });
+                var dict = getter != null ? getter.Invoke(config, new object[] { Group }) as System.Collections.IDictionary : null;
+                if (dict != null && dict.Contains(id))
+                {
+                    var existing = dict[id] as ModConfigItem;
+                    if (existing != null) return existing;
+                }
+            }
+            catch { }
+            return config.AddConfigItem(Group, id, type, defaultValue);
+        }
         /// <summary>每秒把 NML 设置页里的开关同步到运行期配置（NML 配置项没有回调，轮询最省事）。</summary>
         internal static void SyncFromConfig()
         {

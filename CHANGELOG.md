@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.4.3
+
+- **修复设置项重复注册**：NML 启动时会从 `mods_config` 恢复上次的开关，本模组此前又无条件
+  `AddConfigItem`，导致每局刷出 9–22 条 `already exists … Overwriting` 并把用户的设置覆盖回默认值。
+  现在改为 **取已有项 / 没有才创建**（`GetOrAdd`），既保留用户设置，也不会让 ModConfig 内部状态错乱。
+- 该重复注册是「模组管理器里设置窗口打不开 / 图标区域异常」（`ModConfigureWindow.ShowWindow` NRE）的诱因。
+- `CreateGroup` 加保护：已被 NML 恢复时不再重复创建。
+
 ## 1.4.2
 
 - **修复拉远视角下"图标/单位错位"**：`MapLayerStrideUnit=4` 与 `VisibleActorsStride=2` 相位不同，
