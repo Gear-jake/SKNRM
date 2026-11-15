@@ -223,7 +223,7 @@ namespace SKNRM
         public bool AlignIconsWithUnits = true;    // 图标与单位本体同相位刷新（防止图标比人物快一帧、看起来不跟随） // 可见对象重算节流（渲染数据预处理）
         public int VisibleActorsStride = 2;   // 实测 2 最好（3 反而更慢）       // 每 N 帧算一次可见对象
         public bool PauseProjectiles = true;      // 暂停时冻结投射物
-        public bool CachePointerOverUi = true;    // 鼠标没动时复用 UI 命中结果
+        public bool CachePointerOverUi = false;   // 默认关：缓存会让 UI 点击判定滞后（面板闪烁/关不掉）    // 鼠标没动时复用 UI 命中结果
         public bool WorldAgeUiThrottle = true;    // 纪元卡片每 5 帧刷新
         public bool SkipDuplicateStatus = true;   // 跳过重复添加的状态（溺水等）
 

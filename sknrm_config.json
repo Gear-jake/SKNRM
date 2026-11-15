@@ -65,7 +65,6 @@
     "MapLayerStrideUnit":  4,
     "QuantumStrideMultiplier":  1,
     "PauseProjectiles":  true,
-    "CachePointerOverUi":  true,
     "WorldAgeUiThrottle":  true,
     "SkipDuplicateStatus":  true,
     "BulkChangeGuard":  true,
@@ -78,5 +77,6 @@
     "SafeMode":  false,
     "VisibleActorsThrottle":  false,
     "SknLogicJobs":  "updateStats,updateNutritionDecay,u6_checkFrozen,u8_checkUpdateTimers,u7_checkAugmentationEffects,updateEventsBecomeAdult,updateEventsEggHatched",
-    "DisableAnimalAI":  true
+    "DisableAnimalAI":  true,
+    "CachePointerOverUi":  false
 }

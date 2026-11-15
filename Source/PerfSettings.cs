@@ -149,6 +149,18 @@ namespace SKNRM
                 LM.AddToCurrentLocale("upp_bucket", "城市轮转桶容量");
                 LM.AddToCurrentLocale("gc_cap_mb", "GC 硬上限（MB）");
                 LM.AddToCurrentLocale("max_fps", "最大帧率（0=不限）");
+                LM.AddToCurrentLocale("skn_threshold Description", "单位数超过这个值才启用节流；低于它完全按原版运行。");
+                LM.AddToCurrentLocale("skn_throttle_frames Description", "AI 最多降频到 1/N 帧（越大越省，反应越慢）。");
+                LM.AddToCurrentLocale("skn_job_stride Description", "纯模拟 job 的间隔帧数（1 = 关闭分帧，改动需重启）。");
+                LM.AddToCurrentLocale("army_throttle Description", "受保护军队的 AI 间隔帧数。");
+                LM.AddToCurrentLocale("job_seeker_throttle Description", "缺兵城市里待业市民的放宽间隔（用于保证征兵速度）。");
+                LM.AddToCurrentLocale("war_civilian_throttle Description", "交战王国平民的放宽间隔。");
+                LM.AddToCurrentLocale("visible_stride Description", "可见单位渲染数据的重算间隔；调大更省但可能出现视觉抖动。");
+                LM.AddToCurrentLocale("unit_layer_stride Description", "单位层绘制间隔；会自动与可见对象重算同相位。");
+                LM.AddToCurrentLocale("enemy_cache_frames Description", "寻敌结果复用的帧数。");
+                LM.AddToCurrentLocale("upp_bucket Description", "城市轮转每个桶包含的城市数量。");
+                LM.AddToCurrentLocale("gc_cap_mb Description", "托管堆超过该值就强制回收一次（防爆卡）。");
+                LM.AddToCurrentLocale("max_fps Description", "帧率上限，0 表示不限制。");
 
                 LM.AddToCurrentLocale("verbose", "详细日志");
                 LM.AddToCurrentLocale("verbose Description", "逐条打印补丁安装与打标结果。");
