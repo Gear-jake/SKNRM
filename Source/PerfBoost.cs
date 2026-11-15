@@ -232,7 +232,15 @@ namespace SKNRM
             {
                 int skip = 1;
                 if (__instance is ZoneCalculator) skip = PerfConfig.I.MapLayerStrideZone;
-                else if (__instance is UnitLayer) skip = PerfConfig.I.MapLayerStrideUnit;
+                else if (__instance is UnitLayer)
+                {
+                    // 单位层绘制与"可见对象重算"必须同相位：否则圆点与精灵更新时刻不同 → 图标/单位错位
+                    int unit = PerfConfig.I.MapLayerStrideUnit;
+                    int vis = PerfConfig.I.VisibleActorsThrottle ? PerfConfig.I.VisibleActorsStride : 1;
+                    if (unit <= 1) skip = 1;
+                    else if (vis <= 1) skip = unit;
+                    else skip = Math.Min(unit, vis);
+                }
                 else
                 {
                     // 按类型名匹配：这两个层是全图重绘的大户（实测 DebugLayerCursor 7–12ms、PixelFlashEffects 5–8ms）

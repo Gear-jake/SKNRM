@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.4.2
+
+- **修复拉远视角下"图标/单位错位"**：`MapLayerStrideUnit=4` 与 `VisibleActorsStride=2` 相位不同，
+  导致同一帧里圆点（单位层）与精灵/图标（可见对象）更新时刻不一致。
+  现在单位层步长自动取 `min(MapLayerStrideUnit, VisibleActorsStride)`，两者**同相位刷新**。
+- 想彻底消除任何错位感：把 `MapLayerStrideUnit` 设为 1、`VisibleActorsThrottle` 设为 false（会损失约 6fps）。
+
 ## 1.4.1
 
 - 文档：README 明确写明「手机版不适用」及全部阻断点；移除历史遗留的第三方模组名称。
