@@ -29,6 +29,8 @@ namespace SKNRM
     {
         internal static long DrawWorldTicks, DrawUnitTicks, DrawZoneTicks, DrawOtherTicks;
         internal static long DrawCalls;   // 实际发生 draw 的次数（用于归一化）
+        internal static long LayerFrames; // 出现过 draw 的帧数（归一化用）
+        private static int _lastLayerFrame = -1;
         internal static readonly Dictionary<string, long> LayerTicks = new Dictionary<string, long>(8);
 
         internal static void ConsumeDraw(out double worldMs, out double unitMs, out double zoneMs, out double otherMs, out double visibleMs, out string layerTop)
@@ -37,7 +39,7 @@ namespace SKNRM
             long u = System.Threading.Interlocked.Exchange(ref DrawUnitTicks, 0);
             long z = System.Threading.Interlocked.Exchange(ref DrawZoneTicks, 0);
             long o = System.Threading.Interlocked.Exchange(ref DrawOtherTicks, 0);
-            int frames = Math.Max(1, PerfPhase.Frames);   // 每秒帧数，用于把图层耗时换算成 ms/帧
+            int frames = Math.Max(1, (int)System.Threading.Interlocked.Exchange(ref LayerFrames, 0));
             double tpm = System.Diagnostics.Stopwatch.Frequency / 1000.0;
             worldMs = w / tpm / frames;
             unitMs = u / tpm / frames;
@@ -293,6 +295,7 @@ namespace SKNRM
         private static void LayerDrawPostfix(MapLayer __instance, long __state)
         {
             if (__state == 0L || __instance == null) return;
+            if (Time.frameCount != _lastLayerFrame) { _lastLayerFrame = Time.frameCount; System.Threading.Interlocked.Increment(ref LayerFrames); }
             long dt2 = System.Diagnostics.Stopwatch.GetTimestamp() - __state;
             if (__instance is WorldLayer || __instance is WorldLayerEdges) System.Threading.Interlocked.Add(ref DrawWorldTicks, dt2);
             else if (__instance is UnitLayer) System.Threading.Interlocked.Add(ref DrawUnitTicks, dt2);

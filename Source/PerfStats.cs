@@ -93,10 +93,20 @@ namespace SKNRM
 
         internal static void OnException(Exception e)
         {
-            Interlocked.Increment(ref Exceptions);
+            long n = Interlocked.Increment(ref Exceptions);
+
+            // 前 5 次与每 5000 次打印完整堆栈，用来定位到底是哪个补丁在抛（其余限频成一行）
+            bool wantStack = n <= 5 || (n % 5000) == 0;
+            if (wantStack)
+            {
+                Log.Warn("补丁内部异常 #" + n + "（已吞掉，游戏继续）：" + e.GetType().Name + ": " + e.Message
+                         + "\n" + (e.StackTrace ?? "<无堆栈>"));
+                return;
+            }
+
             if (Time.unscaledTime - LastExceptionTime < 10f) return;
             LastExceptionTime = Time.unscaledTime;
-            Log.Warn("补丁内部异常（已吞掉，游戏继续）：" + e.GetType().Name + ": " + e.Message);
+            Log.Warn("补丁内部异常（已吞掉，游戏继续）：" + e.GetType().Name + ": " + e.Message + "（累计 " + n + "）");
         }
     }
 

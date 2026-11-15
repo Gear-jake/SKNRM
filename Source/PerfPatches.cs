@@ -229,8 +229,12 @@ namespace SKNRM
                 // 不调 World.world.isPaused()（internal，且原版 City.update 自己会在 ai 之前 return），
                 // 避免多一个内部成员依赖。
                 if (cfg.UppCityAgeMonths > 0)
+                if (cfg.UppCityAgeMonths > 0)
                 {
-                    int months = Date.getMonthsSince(__instance.data.created_time);
+                    // 城市数据可能尚未初始化（新建/读档中），这里必须判空，否则每帧每城抛一次 NRE
+                    var cdata = __instance.data;
+                    if (cdata == null) return;
+                    int months = Date.getMonthsSince(cdata.created_time);
                     if (months <= cfg.UppCityAgeMonths) return;
                 }
 
