@@ -565,7 +565,7 @@ namespace SKNRM
                 }
                 catch { }
             }
-            if (n <= 1) return true;
+            if (n <= 1) return false;   // 周期 1 = 每帧都跑，绝不能跳过
 
             long id = 0L;
             try

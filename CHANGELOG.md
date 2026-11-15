@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.4.0（代码复查 + 地图层热点）
+
+- **修复严重 bug**：`ShouldSkipThisFrame` 在节流周期为 1（人口 1000–1999）时返回了"跳过"，
+  导致该区间**所有市民 AI 每帧被跳过**（国王/村长不动的另一半原因）。改为 `return false`。
+- **地图层热点可视化**：诊断行新增 `图层[…] 可见=… 最贵=<前三个图层>`（ms/帧）。
+  实测最贵的是 `DebugLayerCursor`（7–10ms/帧）与 `PixelFlashEffects`（3–8ms/帧），`UnitLayer` 3–6ms。
+- **两个重图层改为「每 N 帧画 1 帧」**（`MapLayerStrideDebugCursor=4`、`MapLayerStrideFlashLayer=2`）：
+  DebugLayerCursor 由 7–10ms 降到 **1.5–3.0ms**。
+- F7 设置页补齐：可见对象节流、投射物防护、军队保护、缺兵城市不轮转、大规模变更保护（17 → 22 个开关）。
+- 清理死代码：未使用的 `_visibleFrame`、重复赋值、未接线的设置字段。
+- 诊断行归一化修正：图层耗时改为按帧统计（此前按 draw 调用统计，数值虚高）。
+
 ## 1.3.2
 
 - **修复"军队 / 国王 / 村长一动不动"**：

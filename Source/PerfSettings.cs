@@ -15,6 +15,7 @@ namespace SKNRM
         private static ModConfigItem _skipPathStart, _skipDecision, _unfair, _antiDrop, _verbose;
         private static ModConfigItem _unlockFrameRate, _displayFps, _fpsIndependentSpeed;
         private static ModConfigItem _quantumThrottle, _mapLayerThrottle;
+        private static ModConfigItem _guardProjectiles, _protectArmies, _uppRecruitment, _bulkGuard;
         private static ModConfigItem _pauseProjectiles, _cachePointerOverUi, _worldAgeUiThrottle, _skipDuplicateStatus, _visibleActorsThrottle;
         internal static bool Ready { get; private set; }
 
@@ -45,6 +46,11 @@ namespace SKNRM
                 _fpsIndependentSpeed = config.AddConfigItem(Group, "fps_independent_speed", ConfigItemType.SWITCH, c.FpsIndependentSpeed);
                 _quantumThrottle = config.AddConfigItem(Group, "quantum_sprite_throttle", ConfigItemType.SWITCH, c.QuantumSpriteThrottle);
                 _mapLayerThrottle = config.AddConfigItem(Group, "map_layer_throttle", ConfigItemType.SWITCH, c.MapLayerThrottle);
+                _visibleActorsThrottle = config.AddConfigItem(Group, "visible_actors_throttle", ConfigItemType.SWITCH, c.VisibleActorsThrottle);
+                _guardProjectiles = config.AddConfigItem(Group, "guard_projectiles", ConfigItemType.SWITCH, c.GuardBadProjectiles);
+                _protectArmies = config.AddConfigItem(Group, "protect_armies", ConfigItemType.SWITCH, c.ProtectArmies);
+                _uppRecruitment = config.AddConfigItem(Group, "upp_protect_recruitment", ConfigItemType.SWITCH, c.UppProtectRecruitment);
+                _bulkGuard = config.AddConfigItem(Group, "bulk_change_guard", ConfigItemType.SWITCH, c.BulkChangeGuard);
                 _pauseProjectiles = config.AddConfigItem(Group, "pause_projectiles", ConfigItemType.SWITCH, c.PauseProjectiles);
                 _cachePointerOverUi = config.AddConfigItem(Group, "cache_pointer_ui", ConfigItemType.SWITCH, c.CachePointerOverUi);
                 _worldAgeUiThrottle = config.AddConfigItem(Group, "world_age_ui_throttle", ConfigItemType.SWITCH, c.WorldAgeUiThrottle);
@@ -80,6 +86,16 @@ namespace SKNRM
                 LM.AddToCurrentLocale("quantum_sprite_throttle Description", "库存堆、家族图标、幸福/任务/社交图标、军队与箭头按 2–6 帧分级刷新。");
                 LM.AddToCurrentLocale("map_layer_throttle", "地图层绘制节流");
                 LM.AddToCurrentLocale("map_layer_throttle Description", "区域层每 2 帧、单位层每 4 帧绘制一次（步长可在配置文件里改）。");
+                LM.AddToCurrentLocale("visible_actors_throttle", "可见对象重算节流");
+                LM.AddToCurrentLocale("visible_actors_throttle Description", "每 2 帧算一次可见单位的渲染数据（实测 +6fps）。");
+                LM.AddToCurrentLocale("guard_projectiles", "投射物防护");
+                LM.AddToCurrentLocale("guard_projectiles Description", "拦下空投射物 ID / 坏投射物资产，避免 ArgumentNullException。");
+                LM.AddToCurrentLocale("protect_armies", "军队保护");
+                LM.AddToCurrentLocale("protect_armies Description", "军队单位不受市民级节流影响（队长与战斗中的单位始终满速）。");
+                LM.AddToCurrentLocale("upp_protect_recruitment", "缺兵城市不轮转");
+                LM.AddToCurrentLocale("upp_protect_recruitment Description", "缺战士的城市不参与城市轮转，保证征兵不被拖慢。");
+                LM.AddToCurrentLocale("bulk_change_guard", "大规模变更保护");
+                LM.AddToCurrentLocale("bulk_change_guard Description", "清除/重建期间暂停 GC 择机并关闭节流。");
                 LM.AddToCurrentLocale("pause_projectiles", "暂停时冻结投射物");
                 LM.AddToCurrentLocale("pause_projectiles Description", "游戏暂停时不再更新投射物（真正的暂停）。");
                 LM.AddToCurrentLocale("cache_pointer_ui", "鼠标 UI 命中缓存");
@@ -121,6 +137,11 @@ namespace SKNRM
                 c.FpsIndependentSpeed = _fpsIndependentSpeed.BoolVal;
                 c.QuantumSpriteThrottle = _quantumThrottle.BoolVal;
                 c.MapLayerThrottle = _mapLayerThrottle.BoolVal;
+                c.VisibleActorsThrottle = _visibleActorsThrottle.BoolVal;
+                c.GuardBadProjectiles = _guardProjectiles.BoolVal;
+                c.ProtectArmies = _protectArmies.BoolVal;
+                c.UppProtectRecruitment = _uppRecruitment.BoolVal;
+                c.BulkChangeGuard = _bulkGuard.BoolVal;
                 c.PauseProjectiles = _pauseProjectiles.BoolVal;
                 c.CachePointerOverUi = _cachePointerOverUi.BoolVal;
                 c.WorldAgeUiThrottle = _worldAgeUiThrottle.BoolVal;

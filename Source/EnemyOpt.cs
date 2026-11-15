@@ -177,7 +177,6 @@ namespace SKNRM
             long delta = totalReused - ReusedLast;
             reused = delta >= 0 ? delta : totalReused;
             ReusedLast = totalReused;
-            ReusedLast = totalReused;
         }
 
         private static bool ClearPrefix()

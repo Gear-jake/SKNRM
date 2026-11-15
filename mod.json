@@ -2,7 +2,7 @@
   "name": "SKNRM",
   "GUID": "lead.SKNRM",
   "author": "lead",
-  "version": "1.3.2",
+  "version": "1.4.0",
   "description": "SKNRM（SKN Remake）：WorldBox 0.51.2 的纯性能模组。按人群与战争状态分级节流角色 AI、按桶轮转城市思考、把重计算 job 分帧摊平、优化寻敌扫描，并在读档/战斗时消除已知崩溃与卡顿。玩法与画面保持原版，只降低后台计算量。内置解锁帧率、FPS 显示、图标/地图层节流等性能增强，无需任何外部性能模组。配置：模组目录 sknrm_config.json；游戏内 F7 打开设置页。",
   "RepoUrl": null,
   "targetGameBuild": 719,

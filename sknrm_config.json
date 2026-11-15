@@ -72,5 +72,7 @@
     "BulkChangeSeconds":  5,
     "VisibleActorsThrottle":  true,
     "VisibleActorsStride":  2,
-    "SknPopulationThreshold":  1000
+    "SknPopulationThreshold":  1000,
+    "MapLayerStrideDebugCursor":  4,
+    "MapLayerStrideFlashLayer":  2
 }

@@ -28,19 +28,43 @@ namespace SKNRM
     internal static class PerfBoost
     {
         internal static long DrawWorldTicks, DrawUnitTicks, DrawZoneTicks, DrawOtherTicks;
+        internal static long DrawCalls;   // 实际发生 draw 的次数（用于归一化）
+        internal static readonly Dictionary<string, long> LayerTicks = new Dictionary<string, long>(8);
 
-        internal static void ConsumeDraw(out double worldMs, out double unitMs, out double zoneMs, out double otherMs)
+        internal static void ConsumeDraw(out double worldMs, out double unitMs, out double zoneMs, out double otherMs, out double visibleMs, out string layerTop)
         {
             long w = System.Threading.Interlocked.Exchange(ref DrawWorldTicks, 0);
             long u = System.Threading.Interlocked.Exchange(ref DrawUnitTicks, 0);
             long z = System.Threading.Interlocked.Exchange(ref DrawZoneTicks, 0);
             long o = System.Threading.Interlocked.Exchange(ref DrawOtherTicks, 0);
-            int frames = Math.Max(1, PerfPhase.Frames);
+            int frames = Math.Max(1, PerfPhase.Frames);   // 每秒帧数，用于把图层耗时换算成 ms/帧
             double tpm = System.Diagnostics.Stopwatch.Frequency / 1000.0;
             worldMs = w / tpm / frames;
             unitMs = u / tpm / frames;
             zoneMs = z / tpm / frames;
             otherMs = o / tpm / frames;
+            long v = System.Threading.Interlocked.Exchange(ref VisibleTicks, 0);
+            visibleMs = v / tpm / frames;
+            visibleMs = v / tpm / frames;
+
+            layerTop = "";
+            try
+            {
+                lock (LayerTicks)
+                {
+                    var top = new List<KeyValuePair<string, long>>(LayerTicks);
+                    top.Sort((a, b) => b.Value.CompareTo(a.Value));
+                    var sb = new System.Text.StringBuilder();
+                    for (int i = 0; i < top.Count && i < 3; i++)
+                    {
+                        if (sb.Length > 0) sb.Append(" ");
+                        sb.Append(top[i].Key).Append("=").Append((top[i].Value / tpm / frames).ToString("F2"));
+                    }
+                    layerTop = sb.ToString();
+                    LayerTicks.Clear();
+                }
+            }
+            catch { }
         }
 
         // ── 跳帧表：资产 id → 跳帧数（只在资产数组变化时重建，热路径直查 int[]）──
@@ -133,7 +157,6 @@ namespace SKNRM
         // 这是 8000 单位时“其它”耗时的大头：每帧对全部可见单位并行算一次渲染数据。
         // 单位位置晚一帧更新肉眼看不出，但能省下可观时间。
         internal static long VisibleTicks;
-        private static int _visibleFrame = -1;
 
         private static bool VisibleActorsPrefix(ref long __state)
         {
@@ -210,6 +233,13 @@ namespace SKNRM
                 int skip = 1;
                 if (__instance is ZoneCalculator) skip = PerfConfig.I.MapLayerStrideZone;
                 else if (__instance is UnitLayer) skip = PerfConfig.I.MapLayerStrideUnit;
+                else
+                {
+                    // 按类型名匹配：这两个层是全图重绘的大户（实测 DebugLayerCursor 7–12ms、PixelFlashEffects 5–8ms）
+                    string tn = __instance.GetType().Name;
+                    if (tn == "DebugLayerCursor") { if (PerfConfig.I.MapLayerStrideDebugCursor > 1 && (Time.frameCount % PerfConfig.I.MapLayerStrideDebugCursor) != 0) { PerfStats.Skip(ref PerfStats.LayerDrawSkipped); return false; } }
+                    else if (tn == "PixelFlashEffects") { if (PerfConfig.I.MapLayerStrideFlashLayer > 1 && (Time.frameCount % PerfConfig.I.MapLayerStrideFlashLayer) != 0) { PerfStats.Skip(ref PerfStats.LayerDrawSkipped); return false; } }
+                }
                 if (skip > 1 && (Time.frameCount % skip) == 0)
                 {
                     PerfStats.Skip(ref PerfStats.LayerDrawSkipped);
@@ -223,12 +253,15 @@ namespace SKNRM
 
         private static void LayerDrawPostfix(MapLayer __instance, long __state)
         {
-            if (__state == 0L) return;
+            if (__state == 0L || __instance == null) return;
             long dt2 = System.Diagnostics.Stopwatch.GetTimestamp() - __state;
             if (__instance is WorldLayer || __instance is WorldLayerEdges) System.Threading.Interlocked.Add(ref DrawWorldTicks, dt2);
             else if (__instance is UnitLayer) System.Threading.Interlocked.Add(ref DrawUnitTicks, dt2);
             else if (__instance is ZoneCalculator) System.Threading.Interlocked.Add(ref DrawZoneTicks, dt2);
             else System.Threading.Interlocked.Add(ref DrawOtherTicks, dt2);
+
+            string tname = __instance.GetType().Name;
+            lock (LayerTicks) { long cur; LayerTicks.TryGetValue(tname, out cur); LayerTicks[tname] = cur + dt2; }
         }
 
 

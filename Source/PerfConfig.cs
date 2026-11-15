@@ -228,6 +228,8 @@ namespace SKNRM
         // 地图层绘制步长（越大越省，但画面会顿）：ZoneCalculator / UnitLayer 分别控制
         public int MapLayerStrideZone = 2;
         public int MapLayerStrideUnit = 4;
+        public int MapLayerStrideDebugCursor = 4;   // 调试光标层（实测最贵，7–12ms/frame）
+        public int MapLayerStrideFlashLayer = 2;    // 像素闪光层（伤害/爆炸）
 
         // 图标跳帧倍率：1.0 = 默认表；2.0 = 所有图标类再慢一倍
         public float QuantumStrideMultiplier = 1f;

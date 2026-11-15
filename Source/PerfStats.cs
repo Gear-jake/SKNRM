@@ -110,7 +110,8 @@ namespace SKNRM
         private int _frames;
         private float _lastSecondAvg, _lastSecondWorst;
         private double _simMs, _actorsMs, _drawMs, _plateMs;
-        private double _drawWorldMs, _drawUnitMs, _drawZoneMs, _drawOtherMs;
+        private double _drawWorldMs, _drawUnitMs, _drawZoneMs, _drawOtherMs, _drawVisibleMs;
+        private string _layerTop = "";
         private long _gcHeapMb;
         private int _gc0Last, _gc2Last, _gc0Delta, _gc2Delta;
         private bool _skipNextSample;
@@ -180,7 +181,7 @@ namespace SKNRM
                         _lastSecondAvg = _accum / Mathf.Max(1, _frames);
                         _lastSecondWorst = _worst;
                         PerfPhase.Consume(out _simMs, out _actorsMs, out _drawMs, out _plateMs);
-                        PerfBoost.ConsumeDraw(out _drawWorldMs, out _drawUnitMs, out _drawZoneMs, out _drawOtherMs);
+                        PerfBoost.ConsumeDraw(out _drawWorldMs, out _drawUnitMs, out _drawZoneMs, out _drawOtherMs, out _drawVisibleMs, out _layerTop);
                         EnemyOpt.ConsumeSecond(out _, out _);
                     }
                     _accum = 0f; _frames = 0; _worst = 0f; _timer = 0f;
@@ -256,7 +257,7 @@ namespace SKNRM
                 $"诊断：最近1秒均帧 {avg * 1000f:F1}ms（≈{fps} fps，峰值 {_lastSecondWorst * 1000f:F1}ms）| "
                 + $"闸门={(SknFeature.Enabled ? "开" : "关")} 单位={SknFeature.UnitsAtGate} 节流={SknFeature.EffectiveThrottleFrames()} lowRes视图={SafeLowRes()} | "
                 + $"耗时[模拟={_simMs:F1}ms 其中角色={_actorsMs:F1}ms 绘制={_drawMs:F1}ms 名牌={_plateMs:F1}ms 其它={(avg * 1000.0 - _simMs - _drawMs - _plateMs):F1}ms] | "
-                + $"图层[世界={_drawWorldMs:F1} 单位={_drawUnitMs:F1} 区域={_drawZoneMs:F1} 其它={_drawOtherMs:F1}] | "
+                + $"图层[世界={_drawWorldMs:F1} 单位={_drawUnitMs:F1} 区域={_drawZoneMs:F1} 其它={_drawOtherMs:F1}] 可见={_drawVisibleMs:F1} 最贵={_layerTop} | "
                 + $"GC[堆={_gcHeapMb}MB gen0+{_gc0Delta} gen2+{_gc2Delta}] | 地图={MapBox.width}x{MapBox.height} | "
                 + PerfStats.Snapshot());
         }
