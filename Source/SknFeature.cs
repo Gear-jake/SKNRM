@@ -222,6 +222,25 @@ namespace SKNRM
         }
 
         /// <summary>关键单位：国王 / 城市领袖 / 军队队长 / 任何在军队里的单位 —— 永不节流。</summary>
+        /// <summary>
+        /// 是否"智慧单位"。三种来源任一成立即算：
+        ///   · 资产本身就是文明单位（asset.civ）；
+        ///   · 亚种已被"赋予智慧"（Subspecies.isSapient，游戏里点化动物走这条）；
+        ///   · 已加入文明王国（Kingdom.isCiv）。
+        /// 只有三者都不成立（野兽/怪物）才会被 DisableAnimalAI 冻结。
+        /// </summary>
+        private static bool IsSapientUnit(Actor actor, ActorAsset asset)
+        {
+            try
+            {
+                if (asset != null && asset.civ) return true;
+                if (actor.subspecies != null && actor.subspecies.isSapient()) return true;
+                if (actor.kingdom != null && actor.kingdom.isCiv()) return true;
+            }
+            catch { }
+            return false;
+        }
+
         private static bool IsEssentialActor(Actor actor)
         {
             try
@@ -365,7 +384,10 @@ namespace SKNRM
 
             // ── 非智慧动物：按配置完全禁用 AI（默认开，最省算力）──
             // 关掉 DisableAnimalAI 则动物完全不受节流影响（行为与原版一致）。
-            if (!asset.civ) return PerfConfig.I.DisableAnimalAI;   // 非智慧动物：按配置完全禁用 AI
+            // 注意：世界里的"赋予智慧"是把**亚种**变成 sapient（Subspecies.makeSapient），
+            // 单位资产仍是动物 asset（asset.civ 依旧为 false）。所以判断必须看亚种/王国，
+            // 否则被点化的熊/狼人也会被永久冻结。
+            if (!IsSapientUnit(actor, asset)) return PerfConfig.I.DisableAnimalAI;
 
             // ── 硬保护：正在赶路的单位永不节流 ──
             // 有移动目标却跳过 ai.update() 时，路径与决策不同步，表现就是来回蠕动。

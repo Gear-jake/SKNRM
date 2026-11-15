@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.5.4
+
+- **修复"被赋予智慧的动物仍被冻结"**：判断改为看**亚种/王国**而不是资产。
+  游戏里的"赋予智慧"是 `Subspecies.makeSapient()`（单位资产仍是动物，`asset.civ` 依旧为 false），
+  旧代码会把点化后的熊/狼人一起冻住。
+  现在三者任一成立即视为智慧单位、正常跑 AI：
+  `asset.civ` / `Subspecies.isSapient()` / `Kingdom.isCiv()`。
+  只有真正的野兽、怪物（无智慧亚种、无文明王国）才会被 `DisableAnimalAI` 冻结。
+
 ## 1.5.3
 
 - **非智慧动物 AI 完全禁用**（`DisableAnimalAI`，默认开）：`asset.civ == false` 的单位（动物、怪物）
