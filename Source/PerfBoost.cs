@@ -179,29 +179,60 @@ namespace SKNRM
         }
 
         // ── ② 图标/粒子跳帧 ──
+        /// <summary>跟随单位的图标系统：必须与"可见对象重算"同相位，否则图标会比人物本体快一帧（看起来"不跟随"）。</summary>
+        private static readonly HashSet<string> UnitAttachedIcons = new HashSet<string>
+        {
+            "leaders", "armies", "happiness_icons", "task_icons", "socialize",
+            "family_species_icons", "favorites_items", "highlight_cursor_zones"
+        };
+
         private static bool QuantumSpritePrefix()
         {
-            if (!PerfConfig.I.QuantumSpriteThrottle) return true;
+            var cfg = PerfConfig.I;
+            bool general = cfg.QuantumSpriteThrottle;
+            int unitStride = cfg.VisibleActorsThrottle ? cfg.VisibleActorsStride : 1;
+            bool align = cfg.AlignIconsWithUnits && unitStride > 1;
+            if (!general && !align) return true;
+
             try
             {
                 QuantumSpriteAsset[] assets = AssetManager.quantum_sprites.getArray();
                 if (assets == null) return true;
-                EnsureSpriteSkipTable(assets);
+                if (general) EnsureSpriteSkipTable(assets);
 
                 bool lowRes = World.world.quality_changer.isLowRes();
                 int frame = Time.frameCount;
-                float mul = PerfConfig.I.QuantumStrideMultiplier;
+                float mul = cfg.QuantumStrideMultiplier;
 
                 for (int i = 0; i < assets.Length; i++)
                 {
                     QuantumSpriteAsset asset = assets[i];
                     if (asset == null) continue;
 
-                    int skip = _spriteSkip[i];
-                    if (skip > 1)
+                    bool skipThisFrame = false;
+
+                    // ① 跟单位绑定的图标：与可见对象重算同相位（本体不动的那一帧图标也不动）
+                    if (align && asset.id != null && UnitAttachedIcons.Contains(asset.id)
+                        && (frame % unitStride) == 0)
                     {
-                        int eff = mul > 1f ? (int)(skip * mul + 0.5f) : skip;
-                        if (eff > 1 && frame % eff == 0) continue;
+                        skipThisFrame = true;
+                    }
+
+                    // ② 通用图标节流（默认关闭；开启后才生效）
+                    if (!skipThisFrame && general)
+                    {
+                        int skip = _spriteSkip != null && i < _spriteSkip.Length ? _spriteSkip[i] : 1;
+                        if (skip > 1)
+                        {
+                            int eff = mul > 1f ? (int)(skip * mul + 0.5f) : skip;
+                            if (eff > 1 && frame % eff == 0) skipThisFrame = true;
+                        }
+                    }
+
+                    if (skipThisFrame)
+                    {
+                        PerfStats.Skip(ref PerfStats.VisibleSkipped);
+                        continue;
                     }
 
                     asset.group_system.prepare();

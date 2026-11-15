@@ -15,6 +15,7 @@ namespace SKNRM
         private static ModConfigItem _skipPathStart, _skipDecision, _unfair, _antiDrop, _verbose;
         private static ModConfigItem _unlockFrameRate, _displayFps, _fpsIndependentSpeed;
         private static ModConfigItem _quantumThrottle, _mapLayerThrottle;
+        private static ModConfigItem _alignIcons;
         private static ModConfigItem _guardProjectiles, _protectArmies, _uppRecruitment, _bulkGuard;
         private static ModConfigItem _pauseProjectiles, _cachePointerOverUi, _worldAgeUiThrottle, _skipDuplicateStatus, _visibleActorsThrottle;
         internal static bool Ready { get; private set; }
@@ -30,7 +31,7 @@ namespace SKNRM
                 }
 
                 var c = PerfConfig.I;
-                try { config.CreateGroup(Group); } catch { /* 已存在（NML 从磁盘恢复）时忽略 */ }
+                if (GetGroup(config) == null) config.CreateGroup(Group);
 
                 _sknPlus = GetOrAdd(config, "skn_plus", ConfigItemType.SWITCH, c.SknPlus);
                 _skn2 = GetOrAdd(config, "skn2", ConfigItemType.SWITCH, c.Skn2);
@@ -88,6 +89,8 @@ namespace SKNRM
                 LM.AddToCurrentLocale("map_layer_throttle Description", "区域层每 2 帧、单位层每 4 帧绘制一次（步长可在配置文件里改）。");
                 LM.AddToCurrentLocale("visible_actors_throttle", "可见对象重算节流");
                 LM.AddToCurrentLocale("visible_actors_throttle Description", "每 2 帧算一次可见单位的渲染数据（实测 +6fps）。");
+                LM.AddToCurrentLocale("align_icons_with_units", "图标跟随单位同帧");
+                LM.AddToCurrentLocale("align_icons_with_units Description", "图标与单位本体在同一帧刷新，避免图标比人物快一帧（看起来不跟随）。");
                 LM.AddToCurrentLocale("guard_projectiles", "投射物防护");
                 LM.AddToCurrentLocale("guard_projectiles Description", "拦下空投射物 ID / 坏投射物资产，避免 ArgumentNullException。");
                 LM.AddToCurrentLocale("protect_armies", "军队保护");
@@ -108,7 +111,7 @@ namespace SKNRM
                 LM.AddToCurrentLocale("verbose Description", "逐条打印补丁安装与打标结果。");
 
                 Ready = true;
-                Log.Info("NML 设置页已注册（分组 sknrm，17 个开关）；数值项仍走 sknrm_config.json");
+                Log.Info("NML 设置页已注册（分组 sknrm，" + RegisteredCount + " 个开关）；数值项仍走 sknrm_config.json");
             }
             catch (System.Exception e)
             {
@@ -122,6 +125,20 @@ namespace SKNRM
         /// 就会触发 "already exists ... Overwriting"，把用户上一局的设置覆盖回默认值，
         /// 并且可能让 ModConfig 内部状态不一致（打开设置窗口时 NRE）。
         /// </summary>
+        private static int _registered;
+
+        internal static int RegisteredCount { get { return _registered; } }
+
+        /// <summary>取 NML 里已存在的分组字典（不存在返回 null）。</summary>
+        private static System.Collections.IDictionary GetGroup(ModConfig config)
+        {
+            try
+            {
+                var getter = config.GetType().GetMethod("get_Item", new[] { typeof(string) });
+                return getter != null ? getter.Invoke(config, new object[] { Group }) as System.Collections.IDictionary : null;
+            }
+            catch { return null; }
+        }
         private static ModConfigItem GetOrAdd(ModConfig config, string id, ConfigItemType type, object defaultValue)
         {
             try
@@ -131,10 +148,11 @@ namespace SKNRM
                 if (dict != null && dict.Contains(id))
                 {
                     var existing = dict[id] as ModConfigItem;
-                    if (existing != null) return existing;
+                    if (existing != null) { _registered++; return existing; }
                 }
             }
             catch { }
+            _registered++;
             return config.AddConfigItem(Group, id, type, defaultValue);
         }
         /// <summary>每秒把 NML 设置页里的开关同步到运行期配置（NML 配置项没有回调，轮询最省事）。</summary>
@@ -159,6 +177,7 @@ namespace SKNRM
                 c.QuantumSpriteThrottle = _quantumThrottle.BoolVal;
                 c.MapLayerThrottle = _mapLayerThrottle.BoolVal;
                 c.VisibleActorsThrottle = _visibleActorsThrottle.BoolVal;
+                c.AlignIconsWithUnits = _alignIcons.BoolVal;
                 c.GuardBadProjectiles = _guardProjectiles.BoolVal;
                 c.ProtectArmies = _protectArmies.BoolVal;
                 c.UppProtectRecruitment = _uppRecruitment.BoolVal;

@@ -52,7 +52,7 @@
     "UppProtectWarCities":  true,
     "WarCivilianThrottle":  4,
     "JobSeekerThrottle":  4,
-    "AutoLoadSaveFolder":  "C:\\Users\\Administrator\\AppData\\LocalLow\\mkarpenko\\WorldBox\\saves\\vperf-base",
+    "AutoLoadSaveFolder":  "",
     "AutoLoadAfterSeconds":  10,
     "UnlockFrameRate":  true,
     "MaxFrameRate":  0,
@@ -74,5 +74,6 @@
     "VisibleActorsStride":  2,
     "SknPopulationThreshold":  1000,
     "MapLayerStrideDebugCursor":  4,
-    "MapLayerStrideFlashLayer":  2
+    "MapLayerStrideFlashLayer":  2,
+    "AlignIconsWithUnits":  true
 }
