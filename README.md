@@ -365,17 +365,22 @@ Re-EarlyMordenWar 的 10 个重叠点：
 - 想彻底避免任何冲突，可以把这些开关关掉，只保留 `AiSystemActor.update` 这一层的 AI 节流。
 ---
 
-## 13. 手机版（不适用）
+## 13. 手机版（暂不支持）
 
-**本模组只支持 PC 版（Steam / owl，build 719），手机版无法使用。**
+**本模组目前只支持 PC 版（Steam / owl，build 719）。**
 
-| 阻断点 | 说明 |
+手机端不是"没有模组框架"——实测（MuMu / Android 12 / WorldBox 0.51.4-725 / OWL 启动器）：
+
+| 环节 | 实测结果 |
 |---|---|
-| 加载器 | 本模组是 NeoModLoader 源码模组；NML 只有 PC 版，移动端没有对应加载器 |
-| 运行时 | 移动版是 IL2CPP 构建，Harmony 无法在运行时改写 IL，补丁机制整个不成立 |
-| 元数据 | 本模组需要读取游戏私有字段（如 `AiSystemActor.ai_object`），IL2CPP 裁剪后会失败 |
-| 版本门 | `mod.json` 声明 `targetGameBuild: 719`，移动端构建号不同，加载器会直接拒绝 |
-| 桌面专属 API | `QualitySettings.vSyncCount` 在移动端无效；`Input.mousePosition` 在触屏上只有最后触点，鼠标缓存会长期命中旧值 |
+| 手机端模组框架 | ✅ 存在：内置 NML（`nml/NML` 下含 `Assembly-CSharp-Publicized.dll`、`0Harmony`、Roslyn、Mono.Cecil），运行时为 IL2CPP + Mono/CLR 混合宿主 |
+| 模组目录 | `Android/media/com.mkarpenko.worldbox/mods`（OWL 启动器读取；**必须经启动器「启动游戏」，直连启动会闪退**） |
+| 本模组编译 | ✅ 通过：设备端产出 `LEAD_SKNRM.dll` 68,608 字节，与 PC 完全一致（Roslyn 编译耗时约 142 秒） |
+| 本模组资源加载 | ✅ 通过 |
+| **加载程序集 / 执行 OnModLoad** | ❌ **进程原生崩溃**（`FORTIFY: pthread_mutex_lock called on a destroyed mutex`），无托管异常 |
 
-如果要在移动端做同类优化，需要**另起一个 IL2CPP 插件工程**（BepInEx IL2CPP / MelonLoader），
-把 Harmony 换成 IL2CPP hook、把反射换成 il2cpp 元数据访问 —— 那不是本模组加一个开关能解决的。
+最可疑的位置：`AiSystemActor.update`（手机版 `Assembly-CSharp` 里它**没有自己的 `update`**，继承自泛型基类
+`AiSystem<Actor,…>`，在 IL2CPP 混合宿主上给继承泛型方法装 detour 容易崩）、以及 NML 配置项反射入口。
+
+**结论：要做移动端需要单独的适配分支**（Android 上改用 `Actor.b6_updateAI` 一类普通方法作为节流落点，
+并绕开 NML 配置页），不属于当前发行版范围。等有需求再做。
