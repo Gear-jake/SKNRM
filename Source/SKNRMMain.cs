@@ -35,6 +35,7 @@ namespace SKNRM
 
                 HarmonyInstance = new HarmonyLib.Harmony("lead.SKNRM");
                 int installed = PerfPatches.InstallAll(HarmonyInstance);
+            AiThrottle.Install(HarmonyInstance);
             Guards.Install(HarmonyInstance);
             PerfBoost.Install(HarmonyInstance);
                 PerfPhase.Install(HarmonyInstance);

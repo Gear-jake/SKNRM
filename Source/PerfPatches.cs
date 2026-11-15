@@ -23,14 +23,6 @@ namespace SKNRM
         internal static int InstallAll(HarmonyLib.Harmony harmony)
         {
             int ok = 0;
-            ok += Patch(harmony, typeof(Actor), "b4_checkTaskVerifier", new[] { typeof(float) },
-                new HarmonyMethod(typeof(PerfPatches), nameof(SknVerifierPrefix)), null, "Actor.b4 任务校验");
-            ok += Patch(harmony, typeof(Actor), "b5_checkPathMovement", new[] { typeof(float) },
-                new HarmonyMethod(typeof(PerfPatches), nameof(SknPathPrefix)), null, "Actor.b5 路径起跑");
-            ok += Patch(harmony, typeof(Actor), "b6_0_updateDecision", new[] { typeof(float) },
-                new HarmonyMethod(typeof(PerfPatches), nameof(SknDecisionPrefix)), null, "Actor.b6_0 决策");
-            ok += Patch(harmony, typeof(Actor), "b6_updateAI", new[] { typeof(float) },
-                new HarmonyMethod(typeof(PerfPatches), nameof(SknAiPrefix)), null, "Actor.b6 AI 思考");
             ok += Patch(harmony, typeof(Actor), "updateNutritionDecay", new[] { typeof(bool) },
                 new HarmonyMethod(typeof(PerfPatches), nameof(NutritionPrefix)), null, "Actor.updateNutritionDecay 饥饿停摆");
             ok += Patch(harmony, typeof(MapBox), "updateObjectAge", Type.EmptyTypes,
@@ -82,73 +74,9 @@ namespace SKNRM
         //      0229 是三合一的 b456，跳掉后由 u10 接力，语义不同。要完全复刻 0229 的"冻住不动"，
         //      把 sknrm_config.json 的 SkipPathStart 改 true 即可（已知代价见 README）。
 
-        private static bool SknVerifierPrefix(Actor __instance)
-        {
-            try
-            {
-                if (PerfConfig.I.SkipVerifier && SknFeature.ShouldSkipThisFrame(__instance))
-                {
-                    PerfStats.Skip(ref PerfStats.FrozenVerifier);
-                    return false;
-                }
-            }
-            catch (Exception e)
-            {
-                PerfStats.OnException(e);
-            }
-            return true;
-        }
 
-        private static bool SknPathPrefix(Actor __instance)
-        {
-            try
-            {
-                if (PerfConfig.I.SkipPathStart && SknFeature.ShouldSkipThisFrame(__instance))
-                {
-                    PerfStats.Skip(ref PerfStats.FrozenPath);
-                    return false;
-                }
-            }
-            catch (Exception e)
-            {
-                PerfStats.OnException(e);
-            }
-            return true;
-        }
 
-        private static bool SknDecisionPrefix(Actor __instance)
-        {
-            try
-            {
-                if (PerfConfig.I.SkipDecision && SknFeature.ShouldSkipThisFrame(__instance))
-                {
-                    PerfStats.Skip(ref PerfStats.FrozenDecision);
-                    return false;
-                }
-            }
-            catch (Exception e)
-            {
-                PerfStats.OnException(e);
-            }
-            return true;
-        }
 
-        private static bool SknAiPrefix(Actor __instance)
-        {
-            try
-            {
-                if (PerfConfig.I.SkipAI && SknFeature.ShouldSkipThisFrame(__instance))
-                {
-                    PerfStats.Skip(ref PerfStats.FrozenAI);
-                    return false;
-                }
-            }
-            catch (Exception e)
-            {
-                PerfStats.OnException(e);
-            }
-            return true;
-        }
 
         private static bool NutritionPrefix(Actor __instance)
         {

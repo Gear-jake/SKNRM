@@ -12,6 +12,7 @@ namespace SKNRM
     /// </summary>
     internal static class PerfStats
     {
+        internal static long AiSkipped;         // AI 层节流跳过次数（AiSystemActor.update）
         internal static long FrozenVerifier;    // b4 任务校验被跳过
         internal static long FrozenPath;        // b5 路径起跑被跳过（默认关）
         internal static long FrozenDecision;    // b6_0 决策被跳过
@@ -61,7 +62,7 @@ namespace SKNRM
 
         internal static string Snapshot()
         {
-            return "跳过[b4=" + Interlocked.Read(ref FrozenVerifier)
+            return "跳过[AI=" + Interlocked.Read(ref AiSkipped) + " b4=" + Interlocked.Read(ref FrozenVerifier)
                    + " b5=" + Interlocked.Read(ref FrozenPath)
                    + " b6_0=" + Interlocked.Read(ref FrozenDecision)
                    + " b6=" + Interlocked.Read(ref FrozenAI)
