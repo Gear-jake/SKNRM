@@ -9,14 +9,14 @@ namespace SKNRM
     /// 字段语义一一对应大日春秋 3.1.6：
     ///   SknPlus / Skn2          = 春秋法则里的 SKN++ / SKN2.0 开关
     ///   Unfair / UnfairAntiDrop = 不公平调度 / 不公平调度防掉压
-    ///   SknPopulationThreshold  = 「SKN人口上限」（默认 3000，按年重算闸门）
+    ///   SknPopulationThreshold  = 「人口阈值」（默认 1000，按年重算闸门）
     /// </summary>
     internal sealed class PerfConfig
     {
         // ── SKN ──
         public bool SknPlus = true;
         public bool Skn2 = false;
-        public long SknPopulationThreshold = 400;
+        public long SknPopulationThreshold = 1000;
         public int SknCityZoneThreshold = 12;
         public bool UseLowResGate = true;
         public bool FreezeNutrition = true;
