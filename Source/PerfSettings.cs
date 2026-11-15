@@ -17,6 +17,7 @@ namespace SKNRM
         private static ModConfigItem _unlockFrameRate, _displayFps, _fpsIndependentSpeed;
         private static ModConfigItem _quantumThrottle, _mapLayerThrottle;
         private static ModConfigItem _alignIcons;
+        private static ModConfigItem _disableAnimalAI;
 
         // 数值项（INT_SLIDER）：游戏内可调
         private static ModConfigItem _sknThreshold, _sknThrottleFrames, _sknJobStride;
@@ -59,6 +60,7 @@ namespace SKNRM
                 _protectArmies = GetOrAdd(config, "protect_armies", ConfigItemType.SWITCH, c.ProtectArmies);
                 _uppRecruitment = GetOrAdd(config, "upp_protect_recruitment", ConfigItemType.SWITCH, c.UppProtectRecruitment);
                 _bulkGuard = GetOrAdd(config, "bulk_change_guard", ConfigItemType.SWITCH, c.BulkChangeGuard);
+                _disableAnimalAI = GetOrAdd(config, "disable_animal_ai", ConfigItemType.SWITCH, c.DisableAnimalAI);
                 _pauseProjectiles = GetOrAdd(config, "pause_projectiles", ConfigItemType.SWITCH, c.PauseProjectiles);
                 _cachePointerOverUi = GetOrAdd(config, "cache_pointer_ui", ConfigItemType.SWITCH, c.CachePointerOverUi);
                 _worldAgeUiThrottle = GetOrAdd(config, "world_age_ui_throttle", ConfigItemType.SWITCH, c.WorldAgeUiThrottle);
@@ -110,6 +112,8 @@ namespace SKNRM
                 LM.AddToCurrentLocale("map_layer_throttle Description", "区域层每 2 帧、单位层每 4 帧绘制一次（步长可在配置文件里改）。");
                 LM.AddToCurrentLocale("visible_actors_throttle", "可见对象重算节流");
                 LM.AddToCurrentLocale("visible_actors_throttle Description", "每 2 帧算一次可见单位的渲染数据（实测 +6fps）。");
+                LM.AddToCurrentLocale("disable_animal_ai", "完全禁用非智慧动物 AI");
+                LM.AddToCurrentLocale("disable_animal_ai Description", "动物/怪物不再思考与移动（最省算力；关掉则恢复原版行为）。");
                 LM.AddToCurrentLocale("align_icons_with_units", "图标跟随单位同帧");
                 LM.AddToCurrentLocale("align_icons_with_units Description", "图标与单位本体在同一帧刷新，避免图标比人物快一帧（看起来不跟随）。");
                 LM.AddToCurrentLocale("guard_projectiles", "投射物防护");
@@ -270,6 +274,7 @@ namespace SKNRM
                 c.ProtectArmies = _protectArmies.BoolVal;
                 c.UppProtectRecruitment = _uppRecruitment.BoolVal;
                 c.BulkChangeGuard = _bulkGuard.BoolVal;
+                c.DisableAnimalAI = _disableAnimalAI.BoolVal;
                 c.PauseProjectiles = _pauseProjectiles.BoolVal;
                 c.CachePointerOverUi = _cachePointerOverUi.BoolVal;
                 c.WorldAgeUiThrottle = _worldAgeUiThrottle.BoolVal;

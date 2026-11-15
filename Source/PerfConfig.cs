@@ -217,6 +217,9 @@ namespace SKNRM
         public bool VisibleActorsThrottle = false;
         /// <summary>安全模式：一键关掉所有会改变玩法节拍的节流（城市轮转 / AI 节流 / 逻辑 job 分帧 / 寻敌相位）。</summary>
         public bool SafeMode = false;
+
+        /// <summary>非智慧动物（含怪物）的 AI 完全禁用：不思考、不移动。省算力最狠的一档。</summary>
+        public bool DisableAnimalAI = true;
         public bool AlignIconsWithUnits = true;    // 图标与单位本体同相位刷新（防止图标比人物快一帧、看起来不跟随） // 可见对象重算节流（渲染数据预处理）
         public int VisibleActorsStride = 2;   // 实测 2 最好（3 反而更慢）       // 每 N 帧算一次可见对象
         public bool PauseProjectiles = true;      // 暂停时冻结投射物
