@@ -17,6 +17,12 @@ namespace SKNRM
         private static ModConfigItem _unlockFrameRate, _displayFps, _fpsIndependentSpeed;
         private static ModConfigItem _quantumThrottle, _mapLayerThrottle;
         private static ModConfigItem _alignIcons;
+
+        // 数值项（INT_SLIDER）：游戏内可调
+        private static ModConfigItem _sknThreshold, _sknThrottleFrames, _sknJobStride;
+        private static ModConfigItem _armyThrottle, _jobSeekerThrottle, _warCivilianThrottle;
+        private static ModConfigItem _visibleStride, _unitLayerStride, _enemyCacheFrames;
+        private static ModConfigItem _uppBucket, _gcCapMb, _maxFps;
         private static ModConfigItem _guardProjectiles, _protectArmies, _uppRecruitment, _bulkGuard;
         private static ModConfigItem _pauseProjectiles, _cachePointerOverUi, _worldAgeUiThrottle, _skipDuplicateStatus, _visibleActorsThrottle;
         internal static bool Ready { get; private set; }
@@ -59,6 +65,20 @@ namespace SKNRM
                 _skipDuplicateStatus = GetOrAdd(config, "skip_duplicate_status", ConfigItemType.SWITCH, c.SkipDuplicateStatus);
 
                 _verbose = GetOrAdd(config, "verbose", ConfigItemType.SWITCH, c.Verbose);
+
+                // ── 数值项：INT_SLIDER（游戏内可拖动）──
+                _sknThreshold = GetOrAddIntSlider(config, "skn_threshold", (int)c.SknPopulationThreshold, 200, 20000);
+                _sknThrottleFrames = GetOrAddIntSlider(config, "skn_throttle_frames", c.SknThrottleFrames, 1, 16);
+                _sknJobStride = GetOrAddIntSlider(config, "skn_job_stride", c.SknLogicJobStride, 1, 8);
+                _armyThrottle = GetOrAddIntSlider(config, "army_throttle", c.ArmyThrottleFrames, 1, 8);
+                _jobSeekerThrottle = GetOrAddIntSlider(config, "job_seeker_throttle", c.JobSeekerThrottle, 1, 8);
+                _warCivilianThrottle = GetOrAddIntSlider(config, "war_civilian_throttle", c.WarCivilianThrottle, 1, 8);
+                _visibleStride = GetOrAddIntSlider(config, "visible_stride", c.VisibleActorsStride, 1, 8);
+                _unitLayerStride = GetOrAddIntSlider(config, "unit_layer_stride", c.MapLayerStrideUnit, 1, 8);
+                _enemyCacheFrames = GetOrAddIntSlider(config, "enemy_cache_frames", c.EnemyCacheFrames, 1, 8);
+                _uppBucket = GetOrAddIntSlider(config, "upp_bucket", c.UppBucketCapacity, 1, 20);
+                _gcCapMb = GetOrAddIntSlider(config, "gc_cap_mb", c.GcDeferHardCapMb, 600, 4000);
+                _maxFps = GetOrAddIntSlider(config, "max_fps", c.MaxFrameRate, 0, 240);
 
                 LM.AddToCurrentLocale(Group, "SKNRM 性能设置");
                 LM.AddToCurrentLocale("skn_plus", "平民 AI 跳过（SKN++）");
@@ -112,12 +132,26 @@ namespace SKNRM
                 LM.AddToCurrentLocale("powers_tab_throttle", "（已移除）权能标签节流");
                 LM.AddToCurrentLocale("power_buttons_throttle", "（已移除）权能按钮栏节流");
 
+                // ── 数值项名称 ──
+                LM.AddToCurrentLocale("skn_threshold", "人口阈值（超过后才开始节流）");
+                LM.AddToCurrentLocale("skn_throttle_frames", "AI 节流上限（1/N 帧）");
+                LM.AddToCurrentLocale("skn_job_stride", "逻辑 job 分帧周期（帧）");
+                LM.AddToCurrentLocale("army_throttle", "军队节流周期（帧）");
+                LM.AddToCurrentLocale("job_seeker_throttle", "待业市民放宽周期（帧）");
+                LM.AddToCurrentLocale("war_civilian_throttle", "交战国平民放宽周期（帧）");
+                LM.AddToCurrentLocale("visible_stride", "可见对象重算步长（帧）");
+                LM.AddToCurrentLocale("unit_layer_stride", "单位层绘制步长（帧）");
+                LM.AddToCurrentLocale("enemy_cache_frames", "寻敌缓存帧数");
+                LM.AddToCurrentLocale("upp_bucket", "城市轮转桶容量");
+                LM.AddToCurrentLocale("gc_cap_mb", "GC 硬上限（MB）");
+                LM.AddToCurrentLocale("max_fps", "最大帧率（0=不限）");
+
                 LM.AddToCurrentLocale("verbose", "详细日志");
                 LM.AddToCurrentLocale("verbose Description", "逐条打印补丁安装与打标结果。");
 
                 PruneStale(config);
                 Ready = true;
-                Log.Info("NML 设置页已注册（分组 sknrm，" + RegisteredCount + " 个开关）；数值项仍走 sknrm_config.json");
+                Log.Info("NML 设置页已注册（分组 sknrm，" + RegisteredCount + " 项＝开关+滑条，均可在游戏内调整）");
             }
             catch (System.Exception e)
             {
@@ -146,6 +180,24 @@ namespace SKNRM
             }
             catch { return null; }
         }
+        /// <summary>取已有（或新建）一个整数滑条配置项；已存在时保留玩家当前值。</summary>
+        private static ModConfigItem GetOrAddIntSlider(ModConfig config, string id, int defaultValue, int min, int max)
+        {
+            try
+            {
+                var group = GetGroup(config);
+                if (group != null && group.Contains(id))
+                {
+                    var existing = group[id] as ModConfigItem;
+                    if (existing != null) { _registered++; _ids.Add(id); return existing; }
+                }
+            }
+            catch { }
+            _registered++;
+            _ids.Add(id);
+            return config.AddConfigSliderItemWithIntRange(Group, id, defaultValue, min, max);
+        }
+
         private static ModConfigItem GetOrAdd(ModConfig config, string id, ConfigItemType type, object defaultValue)
         {
             try
@@ -224,6 +276,20 @@ namespace SKNRM
                 c.SkipDuplicateStatus = _skipDuplicateStatus.BoolVal;
 
                 c.Verbose = _verbose.BoolVal;
+
+                // 数值项（滑条）
+                c.SknPopulationThreshold = _sknThreshold.IntVal;
+                c.SknThrottleFrames = Math.Max(1, _sknThrottleFrames.IntVal);
+                c.SknLogicJobStride = Math.Max(1, _sknJobStride.IntVal);
+                c.ArmyThrottleFrames = Math.Max(1, _armyThrottle.IntVal);
+                c.JobSeekerThrottle = Math.Max(1, _jobSeekerThrottle.IntVal);
+                c.WarCivilianThrottle = Math.Max(1, _warCivilianThrottle.IntVal);
+                c.VisibleActorsStride = Math.Max(1, _visibleStride.IntVal);
+                c.MapLayerStrideUnit = Math.Max(1, _unitLayerStride.IntVal);
+                c.EnemyCacheFrames = Math.Max(1, _enemyCacheFrames.IntVal);
+                c.UppBucketCapacity = Math.Max(1, _uppBucket.IntVal);
+                c.GcDeferHardCapMb = Math.Max(600, _gcCapMb.IntVal);
+                c.MaxFrameRate = Math.Max(0, _maxFps.IntVal);
             }
             catch (System.Exception e)
             {
