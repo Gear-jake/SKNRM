@@ -41,7 +41,8 @@ namespace SKNRM
                 EnemyOpt.Install(HarmonyInstance);
                 JobStride.Install(HarmonyInstance);
 
-                Log.Info($"已加载：补丁 {installed} 处，配置 {PerfConfig.I}");
+                HarmonyUtil.LogSummary();
+            Log.Info($"已加载：补丁 {installed} 处，配置 {PerfConfig.I}");
                 if (installed == 0)
                 {
                     Log.Warn("没有任何补丁安装成功——719 的 API 可能再次变动，请查 Player.log 里的 [SKNRM] 警告行。");

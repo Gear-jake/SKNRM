@@ -246,3 +246,56 @@ GC 尖峰：单帧 323ms（其它 178ms，堆 1864MB 触顶回收）
 ```
 [SKNRM] 检测到大规模变更（单位 6712 → 320）：接下来 5 秒暂停 GC 择机并关闭节流…
 ```
+---
+
+## 11. 与其它模组的兼容性
+
+### 11.1 自动共存检查（1.2.4 起）
+
+本模组大量使用"跳过原版方法"的前缀（节流/分帧）。Harmony 的规则是：**任一前缀返回 false，
+原版方法体与所有 postfix 都不执行**。所以如果别的模组在同一个方法上也挂了补丁，
+我们的跳过会把它的逻辑一并吃掉。
+
+因此安装"跳过型"补丁前会先查目标方法的 `HarmonyPatchInfo`：
+**只要发现非本模组的补丁，就放弃安装该补丁（保留原版行为）**，并在日志里列出：
+
+```
+[SKNRM] 共存：跳过型补丁放弃安装（目标已被其它模组占用）：Actor.b6_updateAI AI 思考
+[SKNRM] 共存检查：有 4 个补丁点已被其它模组占用，已放弃安装以保护对方功能：…
+```
+
+含义：**在大型整合包里，宁可少省一点性能，也不会破坏对方功能。**
+
+### 11.2 实测审计（本机 7 个启用模组）
+
+| 模组 | 补丁数 | 与 SKNRM 重叠 | 说明 |
+|---|---|---|---|
+| **Re-EarlyMordenWar** | 426 | **10** | 见下表，其中 4 项由共存检查自动让路 |
+| **FunBoost** | 96 | 4 | `calculateCurElapsed`、`UiWorldAgeInfo.Update`、`Actor.addStatusEffect`、`EnemiesFinder.findEnemiesFrom` |
+| 天工技艺 Supower | 14 | 0 | 无重叠 |
+| 新战争艺术 | 11 | 0 | 无重叠 |
+| RenderFix | 4 | 0 | 无重叠 |
+| ChineseName | 0 | 0 | 无 Harmony 补丁 |
+| BetterZoom | 1 | 0 | 无重叠 |
+
+Re-EarlyMordenWar 的 10 个重叠点：
+
+| 方法 | 对方补丁类型 | 处理 |
+|---|---|---|
+| `Actor.b6_updateAI` | 前缀 | **让路**（否则其逻辑被节流跳过） |
+| `Actor.b6_0_updateDecision` | 前缀（Blockhouses） | **让路** |
+| `MapBox.updateBuildings` | 前缀（RenderBudget） | **让路** |
+| `ActorManager.calculateVisibleActors` | 前缀（RepublicDress） | **让路** |
+| `City.makeWarrior` | 前缀+后缀 | 本模组仅计数（后缀），无冲突 |
+| `Actor.checkHasRenderedItem` | 后缀 | 双方后缀都执行，无冲突 |
+| `CombatActionLibrary.attackRangeAction` | 前缀+后缀 | 仅在"坏投射物"时跳过，正常战斗不受影响 |
+| `ProjectileManager.spawn` | 前缀 | 仅在"空投射物 ID"时跳过 |
+| `QuantumSpriteManager.updateSystems` | 后缀 | 本项默认已关闭（实测更慢） |
+| `UnitWindow.showInfo` | — | 本模组仅加标签（后缀） |
+
+### 11.3 仍然存在的已知交互
+
+- **FunBoost 的视野减半 + 本模组寻敌缩圈**会叠加：平民的实际寻敌半径 = 原版 ÷ 2（FunBoost）再受"只扫本 chunk"（本模组）影响，
+  寻敌更省但也更迟钝；如觉得单位反应慢，把 `EnemyPeacefulRangeZero` 或 `EnemyCivilianRangeZero` 关掉。
+- **FunBoost 的 `calculateCurElapsed`**：本模组同类补丁会自动让路，游戏速度以 FunBoost 为准（两者公式等价）。
+- 若某个模组导致节流全部让路，日志会明确列出，方便定位"为什么优化没生效"。

@@ -39,6 +39,12 @@ namespace SKNRM
                         fail++;
                         continue;
                     }
+                    if (HarmonyUtil.HasForeignPatch(harmony, m))
+                    {
+                        HarmonyUtil.ShouldBackOff(harmony, typeof(BatchActors), name, Type.EmptyTypes, "BatchActors." + name);
+                        fail++;
+                        continue;
+                    }
                     harmony.Patch(m, prefix: new HarmonyMethod(typeof(JobStride), nameof(StridePrefix)));
                     ok++;
                 }

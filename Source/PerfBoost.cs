@@ -85,12 +85,24 @@ namespace SKNRM
             int ok = 0;
             ok += Guards.Patch(harmony, typeof(PerfBoost), typeof(MapBox), "calculateCurElapsed", Type.EmptyTypes,
                 nameof(CurElapsedPrefix), null, "高帧率不改游戏速度");
-            ok += Guards.Patch(harmony, typeof(PerfBoost), typeof(ActorManager), "calculateVisibleActors", Type.EmptyTypes,
-                nameof(VisibleActorsPrefix), nameof(VisibleActorsPostfix), "可见对象重算节流");
-            ok += Guards.Patch(harmony, typeof(PerfBoost), typeof(QuantumSpriteManager), "updateSystems", Type.EmptyTypes,
-                nameof(QuantumSpritePrefix), null, "图标/粒子跳帧");
-            ok += Guards.Patch(harmony, typeof(PerfBoost), typeof(MapLayer), "draw", new[] { typeof(float) }, nameof(LayerDrawPrefix), nameof(LayerDrawPostfix), "地图层绘制节流");
-
+            if (HarmonyUtil.ShouldBackOff(harmony, typeof(PerfBoost), "calculateVisibleActors", Type.EmptyTypes, "可见对象重算节流")) { }
+            else
+            {
+                ok += Guards.Patch(harmony, typeof(PerfBoost), typeof(ActorManager), "calculateVisibleActors", Type.EmptyTypes,
+                    nameof(VisibleActorsPrefix), nameof(VisibleActorsPostfix), "可见对象重算节流");
+            }
+            if (HarmonyUtil.ShouldBackOff(harmony, typeof(PerfBoost), "updateSystems", Type.EmptyTypes, "图标/粒子跳帧")) { }
+            else
+            {
+                ok += Guards.Patch(harmony, typeof(PerfBoost), typeof(QuantumSpriteManager), "updateSystems", Type.EmptyTypes,
+                    nameof(QuantumSpritePrefix), null, "图标/粒子跳帧");
+            }
+            if (HarmonyUtil.ShouldBackOff(harmony, typeof(PerfBoost), "draw", new[] { typeof(float) }, "")) { }
+            else
+            {
+                ok += Guards.Patch(harmony, typeof(PerfBoost), typeof(MapLayer), "draw", new[] { typeof(float) }, nameof(LayerDrawPrefix), nameof(LayerDrawPostfix), "地图层绘制节流");
+    
+            }
             ok += Guards.Patch(harmony, typeof(PerfBoost), typeof(ProjectileManager), "update", new[] { typeof(float) },
                 nameof(ProjectilePausePrefix), null, "暂停冻结投射物");
             ok += Guards.Patch(harmony, typeof(PerfBoost), typeof(PlayerControl), "isPointerOverUIButton", Type.EmptyTypes,

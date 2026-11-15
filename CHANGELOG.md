@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.2.4
+
+- **自动共存检查**：安装"跳过型"补丁前查询目标的 HarmonyPatchInfo，发现其它模组的补丁就放弃安装并记日志，
+  避免在大型整合包里把对方的前缀/后缀一起跳过。
+- 新增 `HarmonyUtil`（共存判定 + 摘要日志）。
+- README 增加第 11 节：本机 7 个模组的补丁重叠审计与处理方式。
+
 ## 1.2.3
 
 - **修复权能栏无法滚动**：移除 `PowersTab.update` 与 `PowerButtonSelector.updateTopButtons` 两个节流补丁。
