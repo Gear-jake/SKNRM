@@ -30,14 +30,20 @@ namespace SKNRM
                 nameof(RangeActionPrefix), null, "远程攻击空投射物");
             ok += Patch(harmony, typeof(Actor), "checkHasRenderedItem", Type.EmptyTypes,
                 null, nameof(HasRenderedItemPostfix), "坏装备精灵");
-            ok += Patch(harmony, typeof(NameplateManager), "update", Type.EmptyTypes,
-                nameof(NameplatePrefix), null, "名牌 LOD");
+            if (!HarmonyUtil.ShouldBackOff(harmony, typeof(NameplateManager), "update", Type.EmptyTypes, "NameplateManager.update 名牌LOD"))
+            {
+                ok += Patch(harmony, typeof(NameplateManager), "update", Type.EmptyTypes,
+                    nameof(NameplatePrefix), null, "名牌 LOD");
+            }
             ok += Patch(harmony, typeof(ResourceAsset), "getGameplaySprite", Type.EmptyTypes,
                 nameof(GameplaySpritePrefix), null, "资源主精灵兜底");
             ok += Patch(harmony, typeof(ResourceAsset), "getSprites", Type.EmptyTypes,
                 nameof(ResourceSpritesPrefix), null, "资源精灵数组兜底");
-            ok += Patch(harmony, typeof(ai.behaviours.BehCityActorCheckAttack), "execute", new[] { typeof(Actor) },
-                nameof(CheckAttackPrefix), null, "进攻行为空目标");
+            if (!HarmonyUtil.ShouldBackOff(harmony, typeof(ai.behaviours.BehCityActorCheckAttack), "execute", new[] { typeof(Actor) }, "BehCityActorCheckAttack.execute 空目标防护"))
+            {
+                ok += Patch(harmony, typeof(ai.behaviours.BehCityActorCheckAttack), "execute", new[] { typeof(Actor) },
+                    nameof(CheckAttackPrefix), null, "进攻行为空目标");
+            }
             ok += Patch(harmony, typeof(MapBox), "finishingUpLoading", Type.EmptyTypes,
                 null, nameof(WorldLoadedPostfix), "读档钩子");
             Log.Info("防护补丁安装 " + ok + "/8（投射物/远程/坏装备/名牌/资源精灵×2/进攻行为/读档钩子）");

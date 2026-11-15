@@ -299,3 +299,26 @@ Re-EarlyMordenWar 的 10 个重叠点：
   寻敌更省但也更迟钝；如觉得单位反应慢，把 `EnemyPeacefulRangeZero` 或 `EnemyCivilianRangeZero` 关掉。
 - **FunBoost 的 `calculateCurElapsed`**：本模组同类补丁会自动让路，游戏速度以 FunBoost 为准（两者公式等价）。
 - 若某个模组导致节流全部让路，日志会明确列出，方便定位"为什么优化没生效"。
+### 11.4 全部已安装模组的审计（含当前未启用的）
+
+不只针对启用中的模组：只要 `Mods\` 里存在，就可能被你在将来启用。下表是**全部 34 个模组目录**中
+与 SKNRM 存在补丁点重叠的（无重叠的 27 个未列出）：
+
+| 模组 | 当前启用 | 补丁数 | 与 SKNRM 重叠的方法 |
+|---|---|---|---|
+| **Re-EarlyMordenWar** | 是 | 426 | 10 个（见 11.2） |
+| **FunBoost** | 是 | 80 | `calculateCurElapsed`、`UiWorldAgeInfo.Update`、`Actor.addStatusEffect`、`EnemiesFinder.findEnemiesFrom` |
+| **AncientWarfare3.0** | 否 | 366 | **11 个**：`MapBox.updateObjectAge`、`Actor.b6_updateAI`、`Actor.updateNutritionDecay`、`City.makeWarrior`、`BehCityActorCheckAttack.execute`、`NameplateManager.update`、`EnemiesFinder.findEnemiesFrom`、`Actor.checkHasRenderedItem`、`ActorManager.calculateVisibleActors`、`CityManager.update`、`BatchActors.u1_checkInside` |
+| WallBox | 否 | 10 | `BehCityActorCheckAttack.execute` |
+| WarProtectionMod | 否 | 12 | `Actor.b3_findEnemyTarget` |
+| XaviiNationTypes | 否 | 74 | `City.update` |
+| 大和民族 | 否 | 10 | `MapBox.updateSimulation`（本模组仅计时，不跳过） |
+| 古典经济学 | 否 | 5 | `MapBox.updateObjectAge`（本模组仅加年度钩子后缀） |
+
+处理方式：**全部由 11.1 的自动共存检查覆盖**——启用其中任何一个时，SKNRM 会在安装阶段
+检测到同点补丁并让路，日志里会明确列出被让路的点，不需要你手动配置。
+
+需要人工留意的只有两处（不是冲突，是"叠加"）：
+
+- `EnemiesFinder.findEnemiesFrom`：本模组与 FunBoost / AncientWarfare3.0 都会缩小寻敌范围 → 叠加后更迟钝；
+- `City.update`：本模组不跳过方法体（只设 `timer_action`），XaviiNationTypes 的补丁仍会执行，互不影响。

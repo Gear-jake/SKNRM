@@ -63,6 +63,11 @@ namespace SKNRM
         {
             try
             {
+                if (HarmonyUtil.ShouldBackOff(harmony, typeof(Actor), "b3_findEnemyTarget", new[] { typeof(float) }, "Actor.b3_findEnemyTarget 寻敌相位"))
+                {
+                    Log.Info("共存：寻敌相位补丁放弃安装（Actor.b3 已被其它模组占用）");
+                    return 0;
+                }
                 var target = AccessTools.Method(typeof(Actor), "b3_findEnemyTarget", new[] { typeof(float) });
                 if (target == null)
                 {
